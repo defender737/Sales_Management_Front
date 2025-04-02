@@ -7,6 +7,7 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer"
 import MainContent from "./components/MainContent";
+import Login from "./components/Login";
 import { SnackbarProvider } from './components/SnackbarProvier';
 
 export default function App() {
@@ -15,16 +16,24 @@ export default function App() {
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <Router>
-        <Box sx={{ display: 'flex', minHeight : '100vh'}}>
-          <Header />
-          <Sidebar />
-          <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-            <SnackbarProvider>
-              <MainContent />
-            </SnackbarProvider>
-            <Footer />
-          </Box>
-        </Box>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/*"
+            element={
+              <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+                <Header />
+                <Sidebar />
+                <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                  <SnackbarProvider>
+                    <MainContent />
+                  </SnackbarProvider>
+                  <Footer />
+                </Box>
+              </Box>
+            }
+          />
+        </Routes>
       </Router>
     </ThemeProvider>
   );

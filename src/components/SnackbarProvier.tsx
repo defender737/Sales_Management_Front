@@ -24,7 +24,7 @@ export const SnackbarProvider = ({ children }: SnackbarProviderProps) => {
   return (
     <SnackbarContext.Provider value={showSnackbar}>
       {children}
-      <Snackbar open={snackbar.open} autoHideDuration={5000} onClose={handleClose}>
+      <Snackbar open={snackbar.open} autoHideDuration={5000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
         <Alert severity={snackbar.severity} onClose={handleClose} sx={{ width: '100%' }}>
           {snackbar.message}
         </Alert>

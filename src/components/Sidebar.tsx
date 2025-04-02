@@ -13,7 +13,7 @@ import {useTheme} from "@mui/material/styles";
 
 const menuItems1 = [
   { text: "매출/지출 기록", icon: <MonetizationOnIcon />, path : "/sales-expenses" },
-  { text: "메출 통계", icon: <BarChartIcon />, path : "/" },
+  { text: "메출 통계", icon: <BarChartIcon />, path : "/Login" },
   { text: "순매출 관리", icon: <SettingsIcon />, path : "/" }
 ];
 

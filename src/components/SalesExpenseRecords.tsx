@@ -13,12 +13,13 @@ import ModalContent from './RecordForm'
 
 // 테이블의 열 이름
 const salesColumns = [
-  { key: "date", label: "날짜" },
-  { key: "amount", label: "금액" },
-  { key: "type", label: "구분" },
-  { key: "description", label: "상세" },
-  { key: "payment", label: "결제 수단" },
-  { key: "etc", label: "비고" },
+  { key: "no", label: "No.", width: "8%" },
+  { key: "date", label: "날짜", width : "15%" },
+  { key: "amount", label: "금액", width : "15%" },
+  { key: "type", label: "구분", width : "15%"  },
+  { key: "description", label: "상세", width : "auto"},
+  { key: "payment", label: "결제 수단", width : "15%" },
+  { key: "etc", label: "비고", width : "15%"  },
 ];
 
 // 페이지 제목
@@ -62,7 +63,16 @@ const SalesExpenseRecords = () => {
     getSalesRecordsList(1, page - 1, 10, sortOrder, typeValue, startDate ?? '', endDate ?? '')
       .then((response) => {
         console.log("데이터 리스폰스 : ", response);
-        setData(response.data.content);
+        const totalEl = response.data.totalElements;
+        const content = response.data.content;
+        const indexedData = content.map((item : SalesRecord, index: number) => {
+          const indexFromTop = (page -1) * 10 + index
+          const rowNumber = sortOrder === 'desc'
+          ? totalEl - indexFromTop
+          : indexFromTop + 1;
+          return {...item, no : rowNumber};
+        })
+        setData(indexedData);
         setTotalPages(response.data.totalPages);
       })
       .catch((error) => {

@@ -76,6 +76,7 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
             console.log(response)
             } catch (error) {
               console.error("데이터 로딩 실패:", error);
+              showSnackbar(snackMessages.get.error('데이터'), "error");
             }
           }
         };
@@ -155,7 +156,7 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
           }, delay);
         } catch (error) {
           console.error('수정 실패:', error);
-          showSnackbar(snackMessages.edit.success('기록'), "error");
+          showSnackbar(snackMessages.edit.error('기록'), "error");
           setEditLoading(false);
           setEditSuccess(false);
         }

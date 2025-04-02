@@ -1,4 +1,5 @@
 export interface SalesRecord {
+    no?: number,
     id: number;
     storeId: number;
     amount: number;

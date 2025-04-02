@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 
 interface TableProps<T> {
   data: T[]; // 테이블에 표시할 데이터
-  columns: { key: string, label: string }[]; // 테이블의 열 이름
+  columns: { key: string, label: string, width : string }[]; // 테이블의 열 이름
   keyExtractor: (item: T) => string | number; // 데이터의 키를 추출하는 함수
   onRowClick? : (id : number) => void;
 }
@@ -17,11 +17,17 @@ interface TableProps<T> {
 export default function BasicTable<T>({ data, columns, keyExtractor, onRowClick}: TableProps<T>) {
   return (
     <TableContainer component={Paper} sx={{minHeight: 587}}>
-      <Table sx={{ minWidth: 650 }} aria-label="table">
+      <Table sx={{ minWidth: 650, width : '100%', tableLayout : "fixed" }} aria-label="table">
         <TableHead>
           <TableRow>
             {columns.map((column) => (
-              <TableCell align='left'>{column.label}</TableCell>
+              <TableCell
+                align="left"
+                sx={{ width: column.width }}
+                key={column.key}
+              >
+                {column.label}
+              </TableCell>
             ))}
           </TableRow>
         </TableHead>
@@ -36,7 +42,16 @@ export default function BasicTable<T>({ data, columns, keyExtractor, onRowClick}
                 onClick={() => (onRowClick ? onRowClick(keyExtractor(row) as number) : undefined)}
                 >
                 {columns.map((column) => (
-                  <TableCell key={`${keyExtractor(row)}-${column.key}`} align="left">
+                  <TableCell
+                  key={`${keyExtractor(row)}-${column.key}`}
+                  align="left"
+                  sx = {{
+                    width: column.width || 'auto',
+                    whiteSpace : 'nowrap',
+                    overflow : 'hidden',
+                    textOverflow : "ellipsis"
+                  }}
+                  >
                     {String(row[column.key as keyof T])}
                   </TableCell>
                 ))}
