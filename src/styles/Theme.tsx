@@ -6,11 +6,17 @@ declare module "@mui/material/styles" {
   interface Theme {
     custom: {
       drawerWidth: number;
+      shape: {
+        borderRadius: number;
+      };
     };
   }
   interface ThemeOptions {
     custom?: {
       drawerWidth?: number;
+      shape?: {
+        borderRadius?: number;
+      };
     };
   }
 }
@@ -92,6 +98,9 @@ const theme = createTheme({
     body1: {
       fontSize: '1rem',
     },
+  },
+  shape: {
+    borderRadius: 8, // ← 원하는 radius 값
   },
   custom: {
     drawerWidth,

@@ -8,6 +8,7 @@ import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer"
 import MainContent from "./components/MainContent";
 import Login from "./components/Login";
+import SignupForm from "./components/SignupForm";
 import { SnackbarProvider } from './components/SnackbarProvier';
 
 export default function App() {
@@ -17,8 +18,9 @@ export default function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignupForm />} />
+        <Route
             path="/*"
             element={
               <Box sx={{ display: 'flex', minHeight: '100vh' }}>

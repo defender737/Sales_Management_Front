@@ -99,7 +99,7 @@ export default function Login() {
                         <Typography variant="subtitle1">
                             아직 계정이 없다면?
                         </Typography>
-                        <Link href="#" variant="subtitle1" underline='none' fontWeight={'bold'}>
+                        <Link href="/signup" variant="subtitle1" underline='none' fontWeight={'bold'}>
                             회원가입
                         </Link>
                     </Box>
