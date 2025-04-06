@@ -16,3 +16,15 @@ export interface pageTitle {
 }
 
 export type SalesRecordForm = Omit<SalesRecord, 'id'>;
+
+export type registerForm={
+    email: string;
+    password: string;
+    confirmPassword: string;
+    name: string;
+    phone: string;
+    isEmailVerified: boolean;
+    agreeCheck: boolean;
+}
+
+export type registerWithoutEmailVerified = Omit<registerForm, 'isEmailVerified'>;

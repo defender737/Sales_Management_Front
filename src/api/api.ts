@@ -1,11 +1,12 @@
 // src/api/api.ts
 import axios from 'axios';
+import {registerForm} from '../types/types'
 
 const api = axios.create({
   baseURL: 'http://localhost:8080/api/',  // 기본 URL 설정
   headers: {
     'Content-Type': 'application/json',
-  },
+  }
 });
 
 // 매장별 매출 내역 조회
@@ -63,6 +64,18 @@ export const editSalesRecord = (id : number, record : {
   return api.put(`records/${id}`, record)
 }
 
-export const deleteSalesRecord = ( id : number) => {
+export const deleteSalesRecord = (id : number) => {
   return api.delete(`records/${id}`)
+}
+
+export const requestEmailVerification = (email : string) => {
+  return api.post('auth/email/verify-request', { email })
+}
+
+export const requestEmailCodeVerification = (email : string, code: string) => {
+  return api.post('auth/email/verify-check', { email, code })
+}
+
+export const register = (registerForm : registerForm) => {
+  return api.post('auth/signup', registerForm)
 }

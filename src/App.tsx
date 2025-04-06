@@ -17,25 +17,25 @@ export default function App() {
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <Router>
-        <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignupForm />} />
-        <Route
-            path="/*"
-            element={
-              <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                <Header />
-                <Sidebar />
-                <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                  <SnackbarProvider>
+        <SnackbarProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignupForm />} />
+            <Route
+              path="/*"
+              element={
+                <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+                  <Header />
+                  <Sidebar />
+                  <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                     <MainContent />
-                  </SnackbarProvider>
-                  <Footer />
+                    <Footer />
+                  </Box>
                 </Box>
-              </Box>
-            }
-          />
-        </Routes>
+              }
+            />
+          </Routes>
+        </SnackbarProvider>
       </Router>
     </ThemeProvider>
   );

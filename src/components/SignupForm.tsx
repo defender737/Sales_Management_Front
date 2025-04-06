@@ -1,19 +1,30 @@
-import React, { useState } from 'react';
-import { Box, Paper, Typography, TextField, Button, Autocomplete, FormControl, Checkbox, InputLabel, OutlinedInput, InputAdornment, Accordion, AccordionSummary, AccordionDetails, Table, TableContainer, TableCell, TableHead, TableRow, TableBody, Collapse } from "@mui/material";
-import { useForm, Controller } from 'react-hook-form';
+import React, { useState, useRef } from 'react';
+import { Box, Paper, Typography, TextField, Button, Autocomplete, FormControl, Checkbox, CircularProgress, InputLabel, OutlinedInput, InputAdornment, Accordion, AccordionSummary, AccordionDetails, Table, TableContainer, TableCell, TableHead, TableRow, TableBody, Collapse } from "@mui/material";
+import { useForm, Controller, set } from 'react-hook-form';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import {requestEmailVerification, requestEmailCodeVerification, register} from '../api/api';
+import { SnackbarContext } from '../contexts/SnackbarContext';
+import {registerWithoutEmailVerified} from '../types/types';
 
 
 const emailDomains = ['gmail.com', 'naver.com', 'daum.net', 'kakao.com'];
 
 export default function SignupForm() {
 
-    // 이메일 자동 완성
-    const [inputValue, setInputValue] = useState('');
-    const [validOpen, setValidOpen] = useState(false);
+    const codeRef = useRef<HTMLInputElement>(null);
 
-    const options = inputValue && !inputValue.includes('@')
-        ? emailDomains.map(domain => `${inputValue}@${domain}`)
+    // 이메일 자동 완성
+    const [email, setEmail] = useState('');
+    const [validOpen, setValidOpen] = useState(false);
+    const showSnackbar = React.useContext(SnackbarContext);
+
+    const [emailVarifyButtonLoading, setEmailVarifyButtonLoading] = useState(false);
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const [emailRequestDisabled, setEmailRequestDisabled] = useState(false);
+    
+
+    const options = email && !email.includes('@')
+        ? emailDomains.map(domain => `${email}@${domain}`)
         : [];
 
     const {
@@ -22,12 +33,70 @@ export default function SignupForm() {
         watch,
         trigger,
         formState: { errors },
-    } = useForm({
+    } = useForm<registerWithoutEmailVerified>({
     });
 
-    const onSubmit = (data: any) => {
-        console.log('회원가입 데이터:', data);
+    const onSubmit = async (data: registerWithoutEmailVerified) => {
+        console.log('회원가입 데이터:', {...data, isEmailVerified : isEmailVerified, email : email});
+        // 이메일 인증 여부에 따라 데이터 처리
+        // 예: isEmailVerified가 true인 경우에만 회원가입 진행
+        if (!isEmailVerified) {
+            showSnackbar("이메일 인증을 완료해주세요.", "error");
+            return;
+        }
+        // 회원가입 API 호출
+        try{
+            const response = await register({...data, isEmailVerified : isEmailVerified, email : email});
+            console.log("회원가입 결과:", response);
+            showSnackbar("회원가입이 완료되었습니다.", "success");
+        }catch (error) {
+            console.error("회원가입 실패:", error);
+            showSnackbar("회원가입에 실패하였습니다.", "error");
+        }
+        // 회원가입 성공 후 처리
+        // 예: 로그인 페이지로 리다이렉트
+        // navigate('/login');
+
     };
+
+    const emailVarifyRequest = async() => {
+        console.log("이메일 인증 요청:", email);
+        setEmailVarifyButtonLoading(true);
+        setEmailRequestDisabled(true);
+        try{
+            const response = await requestEmailVerification(email);
+            console.log("이메일 인증 요청 결과:", response);
+            showSnackbar(response.data, "success");
+            setValidOpen(true);
+
+        }catch (error) {
+            console.error("이메일 인증 요청 실패:", error);
+            showSnackbar("인증코드 발송을 실패하였습니다.", "error");
+        }finally{
+            setEmailVarifyButtonLoading(false);
+            setEmailRequestDisabled(false);
+        }
+    }
+
+    const emailVarifyCodeRequest = async() => {
+        const code = codeRef.current?.value;
+        if(!code){
+            showSnackbar("인증코드를 입력해주세요.", "error");
+            return;
+        }
+        console.log("인증코드 요청:", {email : email, code : code});
+        try{
+            const response = await requestEmailCodeVerification(email, code);
+            console.log("인증코드 요청 결과:", response);
+            showSnackbar(response.data, "success");
+            setIsEmailVerified(true);
+            setValidOpen(false);
+            setEmailRequestDisabled(true);
+        }catch (error) {
+            console.error("인증코드 요청 실패:", error);
+            showSnackbar("인증코드 확인에 실패하였습니다.", "error");
+        }
+    }
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -50,22 +119,33 @@ export default function SignupForm() {
                                 <Autocomplete
                                     freeSolo
                                     options={options}
-                                    inputValue={inputValue}
-                                    onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
+                                    inputValue={email}
+                                    onInputChange={(event, newInputValue) => setEmail(newInputValue)}
+                                    disabled={emailRequestDisabled}
                                     sx={{ flex: 4 }}
                                     renderInput={params => {
                                         return <TextField
                                             {...params}
+                                            name='email'
                                             required
                                             margin="normal"
                                             placeholder="이메일"
-                                            sx={{ mt: 0, mb: 0 }}
+                                            //sx={{ mt: 0, mb: 0 }}
+                                            sx={{ mt: 0, mb: 0, backgroundColor : isEmailVerified ? 'rgba(77, 166, 0, 0.1)' : "white"}}
                                         />;
                                     }}
                                 />
                                 <Button variant="contained" color="primary" sx={{ flex: 1 }}
-                                onClick={() => {setValidOpen(true)}}
-                                >인증 요청</Button>
+                                onClick={emailVarifyRequest}
+                                disabled={emailRequestDisabled}
+                                >
+                                {emailVarifyButtonLoading ? (
+                                    <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                                ) : isEmailVerified ?(
+                                    "인증 완료"
+                                ) : "인증 요청"
+                                }    
+                                </Button>
                             </Box>
                         </Box>
                         {validOpen && (
@@ -82,8 +162,10 @@ export default function SignupForm() {
                                                 required
                                                 margin="normal"
                                                 placeholder="인증번호"
-                                                sx={{ mt: 0, mb: 0, flex : 4}} />
-                                    <Button variant="contained" color="primary" sx={{ flex: 1 }}>인증 하기</Button>
+                                                sx={{ mt: 0, mb: 0, flex : 4}}
+                                                inputRef ={codeRef}
+                                                />
+                                    <Button variant="contained" color="primary" sx={{ flex: 1 }} onClick={emailVarifyCodeRequest}>인증 하기</Button>
                                 </Box>
                             </Box>
                         </Collapse>
@@ -221,7 +303,19 @@ export default function SignupForm() {
                                     <Typography component="span" color="error" sx={{ ml: 0.5 }}>
                                         *
                                     </Typography>
-                                    <Checkbox size='small' />
+                                    <Controller
+                                        name='agreeCheck'
+                                        control={control}
+                                        rules={{ required: '개인정보 수집 및 이용 동의는 필수입니다.' }}
+                                        render={({ field }) => (
+                                            <Checkbox {...field}  size='small' />
+                                        )}
+                                    />
+                                    {errors.agreeCheck && (
+                                        <Typography variant="caption" color="error" sx={{ mt: 0.5 }}>
+                                        {errors.agreeCheck.message as string}
+                                        </Typography>
+                                    )}
                                 </Typography>
                             </Box>
 
@@ -258,7 +352,7 @@ export default function SignupForm() {
                             </Accordion>
                         </Box>
 
-                        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: 18 }}>
+                        <Button type="submit" variant="contained" color="primary" disabled={!isEmailVerified} fullWidth sx={{ mt: 3, fontSize: 18 }}>
                             회원 가입
                         </Button>
 
