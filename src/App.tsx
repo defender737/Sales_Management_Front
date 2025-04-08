@@ -10,6 +10,8 @@ import MainContent from "./components/MainContent";
 import Login from "./components/Login";
 import SignupForm from "./components/SignupForm";
 import { SnackbarProvider } from './components/SnackbarProvier';
+import { CookiesProvider } from "react-cookie";
+import { AuthProvider } from './components/AuthProvider';
 
 export default function App() {
 
@@ -17,25 +19,29 @@ export default function App() {
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <Router>
-        <SnackbarProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignupForm />} />
-            <Route
-              path="/*"
-              element={
-                <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                  <Header />
-                  <Sidebar />
-                  <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                    <MainContent />
-                    <Footer />
-                  </Box>
-                </Box>
-              }
-            />
-          </Routes>
-        </SnackbarProvider>
+        <CookiesProvider>
+          <AuthProvider>
+            <SnackbarProvider>
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignupForm />} />
+                <Route
+                  path="/*"
+                  element={
+                    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+                      <Header />
+                      <Sidebar />
+                      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                        <MainContent />
+                        <Footer />
+                      </Box>
+                    </Box>
+                  }
+                />
+              </Routes>
+            </SnackbarProvider>
+          </AuthProvider>
+        </CookiesProvider>
       </Router>
     </ThemeProvider>
   );

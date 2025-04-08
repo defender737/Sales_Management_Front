@@ -1,7 +1,32 @@
 import { Box, Typography, TextField, Button, Checkbox, FormControlLabel, Link, Paper, Divider } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import { useForm } from 'react-hook-form';
+import {login} from '../api/api'
+import { setAccessTokenGlobal } from '../hooks/tokenManager'
+import { useNavigate } from 'react-router-dom';
+import { use } from 'react';
+
+interface LoginForm {
+    email: string;
+    password: string;
+}
 
 export default function Login() {
+
+    const { register, handleSubmit } = useForm<LoginForm>();
+    const navigate = useNavigate();
+
+    const loginSubmit = async (data: LoginForm) => {
+        try{
+            const response = await login(data);
+            const accessToken = response.data.accessToken;
+            setAccessTokenGlobal(accessToken);
+            navigate('/sales-expenses'); 
+        }catch (error) {
+            console.error('Login failed:', error);
+            alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+        }
+    }
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', backgroundImage : 'url(/assets/img/backImage.jpg)' }}>
             {/* Welcome section */}
@@ -34,17 +59,19 @@ export default function Login() {
                             로그인
                         </Typography>
                     </Box>
-                    <TextField fullWidth margin="normal" label="이메일" variant="standard" />
-                    <TextField fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
-                    <FormControlLabel control={<Checkbox defaultChecked />} label="로그인 유지하기" />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                        <Link href="#" variant="body2" underline='none'>
-                            비밀번호 찾기
-                        </Link>
-                    </Box>
-                    <Button variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize : 18 }}>
-                        로그인
-                    </Button>
+                    <form onSubmit={handleSubmit(loginSubmit)}>
+                        <TextField {...register("email")} fullWidth margin="normal" label="이메일" variant="standard" />
+                        <TextField {...register("password")}fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
+                        <FormControlLabel control={<Checkbox defaultChecked />} label="로그인 유지하기" />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                            <Link href="#" variant="body2" underline='none'>
+                                비밀번호 찾기
+                            </Link>
+                        </Box>
+                        <Button type='submit' variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize : 18 }}>
+                            로그인
+                        </Button>
+                    </form>
                     <Divider sx={{ my: 3 }} textAlign="center">
                         <Typography variant="body2" color="text.secondary">
                             소셜 계정으로 간편 로그인

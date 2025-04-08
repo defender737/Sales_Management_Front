@@ -1,13 +1,88 @@
 // src/api/api.ts
 import axios from 'axios';
 import {registerForm} from '../types/types'
-
+import {setAccessTokenGlobal, getAccessTokenGlobal} from '../hooks/tokenManager'
 const api = axios.create({
   baseURL: 'http://localhost:8080/api/',  // 기본 URL 설정
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  withCredentials: true, // 쿠키를 포함하여 요청
 });
+
+let isRefreshing = false;
+let failedQueue : any[] = [];
+
+const processQueue = (error: any, token : string | null = null) => {
+  failedQueue.forEach((prom : any) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    // 엑세스토큰 만료 등 401 발생 시
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        // api요청이 동시에 일어났고 이미 refreshToken을 요청중인 경우
+        // 대기열failedQueue에 추가
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (token: string) => {
+              originalRequest.headers['Authorization'] = 'Bearer ' + token;
+              resolve(api(originalRequest));
+            },
+            reject: (err: any) => reject(err),
+          });
+        });
+      }
+
+      // 토큰 요청 재발급 요청 상태로 전환
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const response = await reissueAccessToken();
+        const newAccessToken = response.data.accessToken;
+
+        // 상태 업데이트
+        setAccessTokenGlobal(newAccessToken); // <- 상태 변수에 저장
+        originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
+        processQueue(null, newAccessToken);
+        return api(originalRequest); // 원래 요청 다시 실행
+      } catch (err) {
+        processQueue(err, null);
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessTokenGlobal();
+    if (token && !config.url?.includes('auth')) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 // 매장별 매출 내역 조회
 export const getSalesRecordsList = (
@@ -78,4 +153,12 @@ export const requestEmailCodeVerification = (email : string, code: string) => {
 
 export const register = (registerForm : registerForm) => {
   return api.post('auth/signup', registerForm)
+}
+
+export const login = (loginForm : {email: string, password: string}) => {
+  return api.post('auth/login', loginForm)
+}
+
+export const reissueAccessToken = () => {
+  return api.post('auth/reissue')
 }
