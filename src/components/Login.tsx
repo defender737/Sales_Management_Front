@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import {login} from '../api/api'
 import { setAccessTokenGlobal } from '../hooks/tokenManager'
 import { useNavigate } from 'react-router-dom';
-import { use } from 'react';
+import axios from 'axios';
 
 interface LoginForm {
     email: string;
@@ -23,8 +23,10 @@ export default function Login() {
             setAccessTokenGlobal(accessToken);
             navigate('/sales-expenses'); 
         }catch (error) {
-            console.error('Login failed:', error);
-            alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+            if(axios.isAxiosError(error)){
+                let message = error.response?.data.details;
+                alert(message);
+            }
         }
     }
     return (

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Theme from './styles/Theme';
 import { Box, ThemeProvider } from '@mui/material';
@@ -12,6 +11,8 @@ import SignupForm from "./components/SignupForm";
 import { SnackbarProvider } from './components/SnackbarProvier';
 import { CookiesProvider } from "react-cookie";
 import { AuthProvider } from './components/AuthProvider';
+import PublicOnlyRoute from './components/routingComponents/PublicOnlyRoute';
+import RedirectRoute from './components/routingComponents/RedirectRoute';
 
 export default function App() {
 
@@ -23,8 +24,13 @@ export default function App() {
           <AuthProvider>
             <SnackbarProvider>
               <Routes>
+                <Route path="/" element={<RedirectRoute />} />
+
+                <Route element={<PublicOnlyRoute />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignupForm />} />
+                </Route>
+                {/* <Route path="*" element={<NotFound />} /> */}
                 <Route
                   path="/*"
                   element={

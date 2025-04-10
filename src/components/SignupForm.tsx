@@ -74,12 +74,11 @@ export default function SignupForm() {
             setValidOpen(true);
         }catch (error) {
             if(axios.isAxiosError(error)){
-                const msg = error.response?.data;
-                showSnackbar(msg, "error");
-                setEmailError(typeof msg === "string" ? msg : "이메일 오류 발생");
-            }else{
-                showSnackbar("인증 코드 요청에 실패하였습니다.", "error");
-            }
+                console.log(error)
+                let message = error.response?.data?.details;
+                showSnackbar(message, "error");
+                setEmailError(typeof message === "string" ? message : "이메일 오류 발생");
+            }         
         }finally{
             setEmailVarifyButtonLoading(false);
             setEmailRequestDisabled(false);
@@ -101,9 +100,9 @@ export default function SignupForm() {
             setEmailRequestDisabled(true);
         }catch (error) {
             if(axios.isAxiosError(error)){
-                const msg = error.response?.data;
-                showSnackbar(msg, "error");
-                setEmailCodeError(typeof msg === "string" ? msg : "이메일 코드 오류 발생");
+                const message = error.response?.data?.details;
+                showSnackbar(message, "error");
+                setEmailCodeError(typeof message === "string" ? message : "이메일 코드 오류 발생");
             }else{
                 showSnackbar("인증 요청에 실패하였습니다.", "error");
             }

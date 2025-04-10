@@ -20,6 +20,7 @@ import {createSalesRecord, getSalesRecords, editSalesRecord, deleteSalesRecord} 
 import {SalesRecordForm} from '../types/types'
 import { SnackbarContext } from '../contexts/SnackbarContext';
 import {snackMessages} from '../constants/messages'
+import axios from 'axios';
 
 // 금액에 콤마 추가
 const formatNumberWithCommas = (value: number) => {
@@ -155,10 +156,13 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
             setTimeout(() => handleSubbmitAndClose(), 1500);
           }, delay);
         } catch (error) {
-          console.error('수정 실패:', error);
-          showSnackbar(snackMessages.edit.error('기록'), "error");
-          setEditLoading(false);
-          setEditSuccess(false);
+          if(axios.isAxiosError(error)){
+            console.error('수정 실패:', error);
+            let message = error.response?.data.details;
+            showSnackbar(message, "error");
+            setEditLoading(false);
+            setEditSuccess(false);
+          }
         }
       };
       
@@ -182,10 +186,13 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
             setTimeout(() => handleSubbmitAndClose(), 1500);
           }, delay);
         } catch (error) {
-          console.error('삭제 실패:', error);
-          showSnackbar(snackMessages.delete.error('기록'), "error");
-          setDeleteSuccess(false);
-          setDeleteLoading(false);
+          if(axios.isAxiosError(error)){
+            console.error('삭제 실패:', error);
+            let message = error.response?.data.details;
+            showSnackbar(message, "error");
+            setDeleteSuccess(false);
+            setDeleteLoading(false);
+          }
         }
       };
 
