@@ -100,7 +100,7 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 6, // ← 원하는 radius 값
+    borderRadius: 4, // ← 원하는 radius 값
   },
   custom: {
     drawerWidth,

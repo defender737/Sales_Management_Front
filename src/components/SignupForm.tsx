@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Box, Paper, Typography, TextField, Button, Autocomplete, FormControl, Checkbox, CircularProgress, OutlinedInput, Accordion, AccordionSummary, AccordionDetails, Table, TableContainer, TableCell, TableHead, TableRow, TableBody, Collapse} from "@mui/material";
-import { useForm, Controller, set } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {requestEmailVerification, requestEmailCodeVerification, register} from '../api/api';
 import { SnackbarContext } from '../contexts/SnackbarContext';

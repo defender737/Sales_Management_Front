@@ -1,9 +1,7 @@
 import React from "react";
 import {Routes, Route} from "react-router-dom";
 import { Box, Toolbar} from "@mui/material";
-import NotFound from "./NotFound";
 import SalesExpenseRecords from "./SalesExpenseRecords";
-import Login from "./Login";
 import PrivateRoute from "./routingComponents/PrivateRoute";
 
 const MainContent = () => {

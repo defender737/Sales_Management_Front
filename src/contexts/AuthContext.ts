@@ -4,6 +4,7 @@ export interface AuthContextProps {
   accessToken: string | null;
   // setAccessToken: (token: string | null) => void;
   isLoading: boolean;
+  // setIsLoading : (isLoading : boolean) => void
 }
 
 export const AuthContext = createContext<AuthContextProps | undefined>(undefined);

@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Theme from './styles/Theme';
 import { Box, ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
-import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer"
 import MainContent from "./components/MainContent";
@@ -35,7 +34,6 @@ export default function App() {
                   path="/*"
                   element={
                     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-                      <Header />
                       <Sidebar />
                       <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
                         <MainContent />

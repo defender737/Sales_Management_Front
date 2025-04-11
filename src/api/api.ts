@@ -2,6 +2,7 @@
 import axios from 'axios';
 import {registerForm} from '../types/types'
 import {setAccessTokenGlobal, getAccessTokenGlobal} from '../hooks/tokenManager'
+
 const api = axios.create({
   baseURL: 'http://localhost:8080/api/',  // 기본 URL 설정
   headers: {
@@ -31,7 +32,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // 엑세스토큰 만료 등 401 발생 시
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.headers['X-Reissue']) {
       if (isRefreshing) {
         // api요청이 동시에 일어났고 이미 refreshToken을 요청중인 경우
         // 대기열failedQueue에 추가
@@ -62,6 +63,7 @@ api.interceptors.response.use(
         // 토큰 재발급 실패시 모든 대기 요청에 대해 실패 처리
         processQueue(err, null);
         setAccessTokenGlobal(null); // 토큰 삭제
+        console.log(err);
         // 로그아웃 처리 등 추가 작업 필요
         window.location.href = '/login'; // 로그인 페이지로 리다이렉트
         return Promise.reject(err);
@@ -163,5 +165,9 @@ export const login = (loginForm : {email: string, password: string}) => {
 }
 
 export const reissueAccessToken = () => {
-  return api.post('auth/reissue')
+  return api.post('auth/reissue', {},  {headers: { 'X-Reissue': 'true' }})
+}
+
+export const initUserData = () => {
+  return api.get('user/me')
 }
