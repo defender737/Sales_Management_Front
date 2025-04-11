@@ -28,3 +28,16 @@ export type registerForm={
 }
 
 export type registerWithoutEmailVerified = Omit<registerForm, 'isEmailVerified'>;
+
+export type Store = {
+    id: number;
+    storeName: string;
+    businessType: string;
+  };
+
+export type initUser = {
+    id: number;
+    name: string;
+    email: string;
+    storeList: Store[];
+  };

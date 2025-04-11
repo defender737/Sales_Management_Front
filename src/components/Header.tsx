@@ -1,5 +1,5 @@
 // src/components/Header.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
@@ -8,6 +8,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import StoreIcon from '@mui/icons-material/Store';
 import { FormControl, InputLabel, Select, MenuItem, Box, Toolbar, Typography, Avatar, Button, Tooltip, Menu, Divider, ListItemText } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuthStore } from '../stores/UseAuthStore';
+import AddStoreButton from '@mui/icons-material/AddBusiness'
+import {useSelectedStore} from '../stores/UseSelectedStore'
 
 const drawerWidth = 240;
 
@@ -38,8 +41,10 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
+
 const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { selectedStoreId, setSelectedStoreId } = useSelectedStore();
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -48,6 +53,8 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
     setAnchorEl(null);
   };
   const openMenu = Boolean(anchorEl);
+
+  const {user} = useAuthStore();
 
   return (
     <AppBar position="fixed" open={open}
@@ -75,27 +82,71 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
             <Typography variant="h6" noWrap component="div">
               Tally
             </Typography>
-            <FormControl sx={{ minWidth: 300, ml: 4 }} size="small">
+            <FormControl sx={{ minWidth: 300, ml: 4}} size="small">
               <Select
-                id="demo-simple-select"
-              //value={age}
-              //onChange={handleChange}
+                id="storeSelect"
+                displayEmpty
+                value={selectedStoreId ?? ''}
+                onChange={(e) => setSelectedStoreId(Number(e.target.value))}
+                renderValue={(selected) => {
+                  const store = user?.storeList.find((s) => s.id === selected);
+                  return (
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      {store 
+                      ?                       
+                      <Avatar sx={{ bgcolor: "green", width: 30, height: 30 }}>
+                        <StoreIcon fontSize="small" />
+                      </Avatar>
+                      :
+                      <></>
+                      }
+                      <Typography sx={{ ml: 1 }}>{store?.storeName ?? '가게를 선택해주세요'}</Typography>
+                    </Box>
+                  );
+                }}
               >
-                <MenuItem value={10}>가게 1</MenuItem>
-                <MenuItem value={20}>가게 2</MenuItem>
-                <MenuItem value={30}>가게 3</MenuItem>
+                {Array.isArray(user?.storeList) 
+                ?
+                  user?.storeList.map((store) => (
+                    <MenuItem key={store.id} value={store.id}>
+                      <Box sx={{display : 'flex', alignItems : 'center'}}>
+                        <Avatar sx={{ bgcolor: "green", width: 30, height: 30 }}>
+                          <StoreIcon fontSize='small'/>
+                        </Avatar>
+                      </Box>
+                      <ListItemText sx={{ml : 1}}>{store.storeName}</ListItemText>
+                    </MenuItem>
+                  ))
+                  :
+                  <MenuItem key={"noStore"} value={-1}>
+                  <ListItemText sx={{ml : 1}}>우리가게를 추가해주세요</ListItemText>
+                </MenuItem>
+                }
               </Select>
             </FormControl>
+            <Tooltip title="가게 추가" arrow >
+              <IconButton
+                size="large"
+                edge="end"
+                color="inherit"
+                aria-label="addStore"
+                sx={{ ml: 1 }}
+              >
+                <AddStoreButton />
+              </IconButton>
+            </Tooltip>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box onClick={handleAvatarClick} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mr: 3 }} >
-              <Avatar sx={{ bgcolor: "orange" }}>N</Avatar>
+              <Avatar sx={{ bgcolor: "orange" }}>
+                {user?.name?.charAt(0) ?? 'U'}
+              </Avatar>
               <Box sx={{ ml: 1 }}>
                 <Typography variant="body1" sx={{ mb: -0.4 }}>
-                  이신욱
+                  {user?.name ?? '사용자'}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  er888@naver.com
+                  {user?.email ?? '이메일 없음'}
                 </Typography>
               </Box>
             </Box>

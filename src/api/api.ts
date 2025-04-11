@@ -1,7 +1,7 @@
 // src/api/api.ts
 import axios from 'axios';
 import {registerForm} from '../types/types'
-import {setAccessTokenGlobal, getAccessTokenGlobal} from '../hooks/tokenManager'
+import { setAccessToken, getAccessToken } from '../stores/UseAuthStore'
 
 const api = axios.create({
   baseURL: 'http://localhost:8080/api/',  // 기본 URL 설정
@@ -25,6 +25,8 @@ const processQueue = (error: any, token : string | null = null) => {
 
   failedQueue = [];
 }
+
+const setToken = setAccessToken;
 
 api.interceptors.response.use(
   (response) => response,
@@ -55,14 +57,14 @@ api.interceptors.response.use(
         const response = await reissueAccessToken();
         const newAccessToken = response.data.accessToken;
         // 상태 업데이트
-        setAccessTokenGlobal(newAccessToken); // <- 상태 변수에 저장
+        setToken(newAccessToken); // <- 상태 변수에 저장
         originalRequest.headers['Authorization'] = 'Bearer ' + newAccessToken;
         processQueue(null, newAccessToken);
         return api(originalRequest); // 원래 요청 다시 실행
       } catch (err) {
         // 토큰 재발급 실패시 모든 대기 요청에 대해 실패 처리
         processQueue(err, null);
-        setAccessTokenGlobal(null); // 토큰 삭제
+        setToken(null); // 토큰 삭제
         console.log(err);
         // 로그아웃 처리 등 추가 작업 필요
         window.location.href = '/login'; // 로그인 페이지로 리다이렉트
@@ -78,7 +80,7 @@ api.interceptors.response.use(
 
 api.interceptors.request.use(
   (config) => {
-    const token = getAccessTokenGlobal();
+    const token = getAccessToken();
     if (token && !config.url?.includes('auth')) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

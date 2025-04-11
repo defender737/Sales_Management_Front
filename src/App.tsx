@@ -8,19 +8,18 @@ import MainContent from "./components/MainContent";
 import Login from "./components/Login";
 import SignupForm from "./components/SignupForm";
 import { SnackbarProvider } from './components/SnackbarProvier';
-import { CookiesProvider } from "react-cookie";
-import { AuthProvider } from './components/AuthProvider';
 import PublicOnlyRoute from './components/routingComponents/PublicOnlyRoute';
 import RedirectRoute from './components/routingComponents/RedirectRoute';
+import {useAuthInitializer} from './hooks/useAuthInitializer'
+
 
 export default function App() {
+  useAuthInitializer();
 
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <Router>
-        <CookiesProvider>
-          <AuthProvider>
             <SnackbarProvider>
               <Routes>
                 <Route path="/" element={<RedirectRoute />} />
@@ -44,8 +43,6 @@ export default function App() {
                 />
               </Routes>
             </SnackbarProvider>
-          </AuthProvider>
-        </CookiesProvider>
       </Router>
     </ThemeProvider>
   );

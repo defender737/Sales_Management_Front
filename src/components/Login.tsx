@@ -1,10 +1,10 @@
 import { Box, Typography, TextField, Button, Checkbox, FormControlLabel, Link, Paper, Divider } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useForm } from 'react-hook-form';
-import {login} from '../api/api'
-import { setAccessTokenGlobal } from '../hooks/tokenManager'
+import { login, initUserData } from '../api/api'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuthStore } from '../stores/UseAuthStore';
 
 interface LoginForm {
     email: string;
@@ -13,6 +13,8 @@ interface LoginForm {
 
 export default function Login() {
 
+    const {setUser, setAccessToken} = useAuthStore();
+
     const { register, handleSubmit } = useForm<LoginForm>();
     const navigate = useNavigate();
 
@@ -20,7 +22,9 @@ export default function Login() {
         try{
             const response = await login(data);
             const accessToken = response.data.accessToken;
-            setAccessTokenGlobal(accessToken);
+            setAccessToken(accessToken);
+            const userData = await initUserData();
+            setUser(userData.data);
             navigate('/sales-expenses'); 
         }catch (error) {
             if(axios.isAxiosError(error)){
