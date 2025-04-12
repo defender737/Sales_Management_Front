@@ -9,7 +9,7 @@ export function useAuthInitializer() {
   const { setIsLoading, setAccessToken, setUser } = useAuthStore();
 
   useEffect(() => {
-    const skipPaths = ['/login', '/signup'];
+    const skipPaths = ['/signup'];
     const currentPath = window.location.pathname;
 
     if (skipPaths.includes(currentPath)) {
@@ -22,14 +22,12 @@ export function useAuthInitializer() {
         const res = await reissueAccessToken();
         const token = res.data.accessToken;
         setAccessToken(token);
-
         const userRes = await initUserData();
         setUser(userRes.data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
           const message = error.response?.data?.details;
-          alert(message);
+          if(currentPath !== '/login')alert(message);
           setAccessToken(null);
           setUser(null);
           console.warn('자동 로그인 실패');

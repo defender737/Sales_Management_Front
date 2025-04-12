@@ -5,8 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer"
 import MainContent from "./components/MainContent";
-import Login from "./components/Login";
-import SignupForm from "./components/SignupForm";
+import Login from "./pages/Login";
+import SignupForm from "./pages/SignupForm";
 import { SnackbarProvider } from './components/SnackbarProvier';
 import PublicOnlyRoute from './components/routingComponents/PublicOnlyRoute';
 import RedirectRoute from './components/routingComponents/RedirectRoute';

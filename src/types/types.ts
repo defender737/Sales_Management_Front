@@ -33,7 +33,13 @@ export type Store = {
     id: number;
     storeName: string;
     businessType: string;
+    roadAdress? : string;
+    detailAdress? : string;
+    zipCode? :string;
+    imageUrl?: string;
   };
+
+  export type storeForm = Omit<SalesRecord, 'id'>;
 
 export type initUser = {
     id: number;

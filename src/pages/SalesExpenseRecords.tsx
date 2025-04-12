@@ -2,14 +2,14 @@ import * as React from 'react';
 import { Container, Box, Tabs, Tab, TextField, IconButton, Button, Pagination, ToggleButtonGroup, ToggleButton, Collapse } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import Table from './Table';
-import PageTitle from './PageTitle';
+import Table from '../components/Table';
+import PageTitle from '../components/PageTitle';
 import { SalesRecord } from '../types/types';
 import { getSalesRecordsList } from '../api/api';
-import SelectSmall from './SelectSmall';
+import SelectSmall from '../components/SelectSmall';
 import { SelectChangeEvent } from '@mui/material/Select';
-import Modal from './Modal'
-import ModalContent from './RecordForm'
+import Modal from '../components/Modal'
+import ModalContent from '../components/RecordForm'
 
 // 테이블의 열 이름
 const salesColumns = [
@@ -33,7 +33,7 @@ const selectOptions = [
   { value: 'asc', label: '과거순' },
 ]
 
-const SalesExpenseRecords = () => {
+export default function SalesExpenseRecords () {
   const [typeValue, setTypeValue] = React.useState('all'); // 탭 값 상태 생성
   const [data, setData] = React.useState<SalesRecord[]>([]); // 기록 데이터를 저장할 상태 생성
   const [page, setPage] = React.useState(1); // 페이지 상태 생성
@@ -137,7 +137,7 @@ const SalesExpenseRecords = () => {
   };
 
   return (
-    <>
+    <Box>
       <PageTitle title={pageTitle.title} subTitle={pageTitle.subTitle} />
       <Container sx={{
         borderRadius: "5px",
@@ -225,8 +225,6 @@ const SalesExpenseRecords = () => {
          rowId = {editTargetId ?? undefined}
          />
       </Modal>
-    </>
+    </Box>
   );
 }
-
-export default SalesExpenseRecords;

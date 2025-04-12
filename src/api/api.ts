@@ -1,6 +1,6 @@
 // src/api/api.ts
 import axios from 'axios';
-import {registerForm} from '../types/types'
+import {registerForm, storeForm} from '../types/types'
 import { setAccessToken, getAccessToken } from '../stores/UseAuthStore'
 
 const api = axios.create({
@@ -172,4 +172,20 @@ export const reissueAccessToken = () => {
 
 export const initUserData = () => {
   return api.get('user/me')
+}
+
+export const createStore = (storeData : storeForm, imageFile : File | null) => {
+  const formData = new FormData();
+
+  formData.append('store', new Blob([JSON.stringify(storeData)], {type : 'application/json'}));
+
+  if(imageFile){
+    formData.append('image', imageFile);
+  }
+
+  return api.post('/store', formData, {
+    headers:{
+      'Content-Type' : 'multipart/form-data'
+    }
+  });
 }

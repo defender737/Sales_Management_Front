@@ -6,7 +6,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {requestEmailVerification, requestEmailCodeVerification, register} from '../api/api';
 import { SnackbarContext } from '../contexts/SnackbarContext';
 import {registerWithoutEmailVerified} from '../types/types';
-import Modal from './Modal'
+import Modal from '../components/Modal'
 import axios from 'axios';
 
 

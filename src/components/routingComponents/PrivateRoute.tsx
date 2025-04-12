@@ -5,7 +5,6 @@ import { useAuthStore } from '../../stores/UseAuthStore';
 // 엑세스 토큰이 없는 경우 로그인 페이지로 리다이렉트
 const PrivateRoute = () => {
   const {accessToken, isLoading} = useAuthStore();
-  console.log(accessToken)
   if(isLoading) {
     return null;
   }
