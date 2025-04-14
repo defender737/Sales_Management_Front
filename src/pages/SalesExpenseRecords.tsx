@@ -1,15 +1,26 @@
-import * as React from 'react';
-import { Container, Box, Tabs, Tab, TextField, IconButton, Button, Pagination, ToggleButtonGroup, ToggleButton, Collapse } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
-import Table from '../components/Table';
-import PageTitle from '../components/PageTitle';
+import {useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 import { SalesRecord } from '../types/types';
 import { getSalesRecordsList } from '../api/api';
+
+//MUI 컴포넌트
+import { Container, Box, Tabs, Tab, TextField, IconButton, Button, Pagination, ToggleButtonGroup, ToggleButton, Collapse } from '@mui/material';
+
+//아이콘
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
+
+//컴포넌트
+import Table from '../components/Table';
+import PageTitle from '../components/PageTitle';
 import SelectSmall from '../components/SelectSmall';
-import { SelectChangeEvent } from '@mui/material/Select';
 import Modal from '../components/Modal'
 import ModalContent from '../components/RecordForm'
+// 훅 & 컨텍스트
+import { SelectChangeEvent } from '@mui/material/Select';
+import {useSelectedStore} from '../stores/UseSelectedStore'
+import {SnackbarContext} from '../contexts/SnackbarContext'
+
 
 // 테이블의 열 이름
 const salesColumns = [
@@ -27,114 +38,132 @@ const pageTitle = {
   title: "매출 / 지출 기록",
   subTitle: "매출 및 지출을 기록하고 조회합니다.",
 }
-
+// 정렬 방식
 const selectOptions = [
   { value: 'desc', label: '최신순' },
   { value: 'asc', label: '과거순' },
 ]
 
 export default function SalesExpenseRecords () {
-  const [typeValue, setTypeValue] = React.useState('all'); // 탭 값 상태 생성
-  const [data, setData] = React.useState<SalesRecord[]>([]); // 기록 데이터를 저장할 상태 생성
-  const [page, setPage] = React.useState(1); // 페이지 상태 생성
-  const [totalPages, setTotalPages] = React.useState(1); // 전체 페이지 수 상태 생성
-  const [sortOrder, setSortOrder] = React.useState('desc'); // 정렬 상태 추가
-  const [toggleValue, setToggleValue] = React.useState("all"); // 토글 버튼 값 상태 생성zs
-  const [startDate, setStartDate] = React.useState<string | null>(null);
-  const [endDate, setEndDate] = React.useState<string | null>(null);
-  const [modalOpen, setModalOpen] = React.useState(false); 
-  const [refreshTrigger, setRefreshTrigger] = React.useState(0);
-  const [editTargetId, setEditTargetId] = React.useState<number | null>(null);
-
+  const [typeValue, setTypeValue] = useState('all'); // 탭 값 상태 생성
+  const [data, setData] = useState<SalesRecord[]>([]); // 기록 데이터를 저장할 상태 생성
+  const [page, setPage] = useState(1); // 페이지 상태 생성
+  const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수 상태 생성
+  const [sortOrder, setSortOrder] = useState('desc'); // 정렬 상태 추가
+  const [toggleValue, setToggleValue] = useState("all"); // 토글 버튼 값 상태 생성
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null); 
+  const [modalOpen, setModalOpen] = useState(false); 
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [editTargetId, setEditTargetId] = useState<number | null>(null);
+  const { selectedStoreId } = useSelectedStore();
+  const showSnackbar = useContext(SnackbarContext);
+  
+  //모달 open
   const handleOpen = () => {
     setEditTargetId(null);
     setModalOpen(true);
   };
+  // 모달 close
   const handleClose = () => {setModalOpen(false); setEditTargetId(null)};
   const handleSubbmitAndClose = () => {setModalOpen(false); setPage(1); setRefreshTrigger(prev => prev + 1);};
-
+  // 테이블 row 클릭
   const handleRowClick = (id: number) => {
     setEditTargetId(id);
     setModalOpen(true);
   };
 
-  // 매출/지출 기록 데이터 불러오기
-  React.useEffect(() => {
-    getSalesRecordsList(1, page - 1, 10, sortOrder, typeValue, startDate ?? '', endDate ?? '')
-      .then((response) => {
-        console.log("데이터 리스폰스 : ", response);
-        const totalEl = response.data.totalElements;
-        const content = response.data.content;
-        const indexedData = content.map((item : SalesRecord, index: number) => {
-          const indexFromTop = (page -1) * 10 + index
-          const rowNumber = sortOrder === 'desc'
-          ? totalEl - indexFromTop
-          : indexFromTop + 1;
-          return {...item, no : rowNumber};
-        })
-        setData(indexedData);
-        setTotalPages(response.data.totalPages);
-      })
-      .catch((error) => {
-        console.error('Error : ', error);
-      });
-  }, [page, sortOrder, startDate, endDate, typeValue, refreshTrigger]);// 페이지가 변경될 때마다 데이터 재요청
-
-  // 탭 변경 이벤트 핸들러
-  const handleTypeTabChange = (event: React.SyntheticEvent, value: string) => {
-    setTypeValue(value);
-  };
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
-  }
-  const handleSelectChange = (event: SelectChangeEvent) => {
-    setSortOrder(event.target.value);
-    setPage(1); // 정렬 순서가 변경되면 페이지를 1로 초기화
-  };
-
-  const handleToggleChange = (event: React.MouseEvent<HTMLElement>, value: string) => {
-    if (value !== null) {
-      setToggleValue(value);
-      setPage(1);
-      const today = new Date(); // 오늘 날짜
-      const endDate = today.toISOString().split('T')[0]; // 오늘 날짜를 yyyy-MM-dd 형식으로 변환
-
-      if (value === "all") {
-        setStartDate(null);
-        setEndDate(null);
-      } else if (value === "oneMonth") {
-        const oneMonthAgo = new Date(today);
-        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-        const startDate = oneMonthAgo.toISOString().split('T')[0];
-        setStartDate(startDate);
-        setEndDate(endDate);
-      } else if (value === "threeMonth") {
-        const threeMonthsAgo = new Date(today);
-        threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-        const startDate = threeMonthsAgo.toISOString().split('T')[0];
-        setStartDate(startDate);
-        setEndDate(endDate);
+    // 탭 변경 이벤트 핸들러
+    const handleTypeTabChange = (event: React.SyntheticEvent, value: string) => {
+      setTypeValue(value);
+    };
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+      setPage(value);
+    }
+    const handleSelectChange = (event: SelectChangeEvent) => {
+      setSortOrder(event.target.value);
+      setPage(1); // 정렬 순서가 변경되면 페이지를 1로 초기화
+    };
+  
+    const handleToggleChange = (event: React.MouseEvent<HTMLElement>, value: string) => {
+      if (value !== null) {
+        setToggleValue(value);
+        setPage(1);
+        const today = new Date(); // 오늘 날짜
+        const endDate = today.toISOString().split('T')[0]; // 오늘 날짜를 yyyy-MM-dd 형식으로 변환
+  
+        if (value === "all") {
+          setStartDate(null);
+          setEndDate(null);
+        } else if (value === "oneMonth") {
+          const oneMonthAgo = new Date(today);
+          oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+          const startDate = oneMonthAgo.toISOString().split('T')[0];
+          setStartDate(startDate);
+          setEndDate(endDate);
+        } else if (value === "threeMonth") {
+          const threeMonthsAgo = new Date(today);
+          threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+          const startDate = threeMonthsAgo.toISOString().split('T')[0];
+          setStartDate(startDate);
+          setEndDate(endDate);
+        }
+      }
+    };
+  
+    const handleDateSearchButtonClick = () => {
+      const startInput = document.getElementById('startDate') as HTMLInputElement;
+      const endInput = document.getElementById('endDate') as HTMLInputElement;
+      if (startInput && endInput) {
+        setStartDate(startInput.value);
+        setEndDate(endInput.value);
+        setPage(1); // 검색 시 페이지 초기화
       }
     }
-  };
+  
+    const getTodayDate = () => new Date().toISOString().split('T')[0];
+  
+    const getOneMonthAgoDate = () => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - 1);
+      return date.toISOString().split('T')[0];
+    };
 
-  const handleDateSearchButtonClick = () => {
-    const startInput = document.getElementById('startDate') as HTMLInputElement;
-    const endInput = document.getElementById('endDate') as HTMLInputElement;
-    if (startInput && endInput) {
-      setStartDate(startInput.value);
-      setEndDate(endInput.value);
-      setPage(1); // 검색 시 페이지 초기화
-    }
-  }
-
-  const getTodayDate = () => new Date().toISOString().split('T')[0];
-
-  const getOneMonthAgoDate = () => {
-    const date = new Date();
-    date.setMonth(date.getMonth() - 1);
-    return date.toISOString().split('T')[0];
-  };
+  useEffect(() => {
+    if (!selectedStoreId || selectedStoreId <= 0) return;
+  
+    const getRecords = async () => {
+      try {
+        const response = await getSalesRecordsList(
+          selectedStoreId,
+          page - 1,
+          10,
+          sortOrder,
+          typeValue,
+          startDate ?? '',
+          endDate ?? ''
+        );
+        const totalEl = response.data.totalElements;
+        const content = response.data.content;
+        const indexedData = content.map((item: SalesRecord, index: number) => {
+          const indexFromTop = (page - 1) * 10 + index;
+          const rowNumber =
+            sortOrder === 'desc' ? totalEl - indexFromTop : indexFromTop + 1;
+          return { ...item, no: rowNumber };
+        });
+        setData(indexedData);
+        setTotalPages(response.data.totalPages);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          const message = error.response?.data.details;
+          showSnackbar('기록 조회를 실패했습니다.', 'error');
+          alert(message);
+        }
+      }
+    };
+  
+    getRecords();
+  }, [page, sortOrder, startDate, endDate, typeValue, refreshTrigger, selectedStoreId]);
 
   return (
     <Box>

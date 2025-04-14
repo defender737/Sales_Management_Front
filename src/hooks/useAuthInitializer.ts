@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useAuthStore } from '../stores/UseAuthStore';
 import { reissueAccessToken, initUserData } from '../api/api';
 
-export function useAuthInitializer() {
+export function UseAuthInitializer() {
   const { setIsLoading, setAccessToken, setUser } = useAuthStore();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function useAuthInitializer() {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const message = error.response?.data?.details;
-          if(currentPath !== '/login')alert(message);
+          if(currentPath !== '/login' && currentPath !== '/Login') alert(message);
           setAccessToken(null);
           setUser(null);
           console.warn('자동 로그인 실패');

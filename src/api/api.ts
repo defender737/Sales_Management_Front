@@ -189,3 +189,19 @@ export const createStore = (storeData : storeForm, imageFile : File | null) => {
     }
   });
 }
+
+export const updateUser = (id: number, userData : {name: string, phone: string}, imageFile : File | null) => {
+  const formData = new FormData();
+
+  formData.append('user', new Blob([JSON.stringify(userData)], {type: 'application/json'}));
+
+  if(imageFile){
+    formData.append('image', imageFile);
+  }
+
+  return api.put(`user/${id}`, formData, {
+    headers:{
+      'Content-Type' : 'multipart/form-data'
+    }
+  });
+}

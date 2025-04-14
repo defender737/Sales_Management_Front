@@ -6,17 +6,20 @@ import {
     Button,
     MenuItem,
     Select,
-    InputLabel,
     FormControl,
     Avatar,
 } from '@mui/material';
-import { useState } from 'react';
+import { useState, useContext} from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import PageTitle from '../components/PageTitle'
 import DaumPostcode from 'react-daum-postcode';
 import Modal from '../components/Modal'
-import {createStore} from '../api/api'
+import {createStore, initUserData} from '../api/api'
 import axios from 'axios';
+import {SnackbarContext} from '../contexts/SnackbarContext'
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from '../stores/UseAuthStore'
+
 
 const pageTitle = {
     title: '매장 추가',
@@ -36,28 +39,22 @@ export default function AddStoreForm() {
     const [openPostcode, setOpenPostcode] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-    const onSubmit = async (data: any) => {
-
-        console.log('매장 등록:', data);
-        try{
-            const response = await createStore(data, imageFile);
-            console.log(response)
-
-        }catch(error){
-            if(axios.isAxiosError(error)){
-                let message = error.response?.data.details;
-                alert(message)
-            }
-        }
-        // TODO: 서버 전송 로직 추가
-    };
+    const [openResultModal, setOpenResultModal] = useState(false);
+    const showSnackbar = useContext(SnackbarContext);
+    const navigate = useNavigate();
 
     const handlePostCodeButtonClick = () => {
-        setOpenPostcode(true);
+      setOpenPostcode(true);
     }
     const handlePostCodeClose = () => {
         setOpenPostcode(false);
+    }
+    const redirectToMain = () => {
+      setOpenResultModal(false);
+      navigate('/');
+     };
+    const resultModalClose = () => {
+      setOpenResultModal(false);
     }
     const selectAddress = (data: any) => {
         const { roadAddress, zonecode, buildingName } = data;
@@ -68,6 +65,30 @@ export default function AddStoreForm() {
         setValue('zipCode', zonecode);
         handlePostCodeClose();
     }
+    
+
+    const onSubmit = async (data: any) => {
+
+        console.log('매장 등록:', data);
+        try{
+            const response = await createStore(data, imageFile);
+            console.log(response)
+            showSnackbar("새로운 매장이 등록되었습니다.", "success");
+
+            const updatedUser = await initUserData();
+            useAuthStore.getState().setUser(updatedUser.data);
+
+            setOpenResultModal(true);
+        }catch(error){
+            if(axios.isAxiosError(error)){
+                let message = (error.response?.data.details && error.response?.data.details !== undefined) ? error.response?.data.details : error.response?.data.message;
+                alert(message)
+                showSnackbar(message, "error");
+
+            }
+        }
+        // TODO: 서버 전송 로직 추가
+    };
 
     return (
         <Box sx={{ mx: 'auto' }}>
@@ -197,6 +218,19 @@ export default function AddStoreForm() {
                     height: '600px'
                 }} />
             </Modal>
+             <Modal open = {openResultModal} handleClose={resultModalClose} title={{title :'매장 추가 완료', subTitle : ""}}>
+                        <Box sx={{ p: 4, textAlign: 'center' }}>
+                            <Typography variant="h4" sx={{ mb: 2 }}>
+                                새로운 매장이 등록되었습니다.
+                            </Typography>
+                            {/* <Typography variant="body1" sx={{ mb: 4 }}>
+                                새로운 매장을 관리해보세요.
+                            </Typography> */}
+                            <Button variant="contained" color="primary" onClick={redirectToMain}>
+                                메인으로 돌아가기
+                            </Button>
+                        </Box>
+                    </Modal>
         </Box>
     );
 }

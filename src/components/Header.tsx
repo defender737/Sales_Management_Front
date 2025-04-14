@@ -1,5 +1,6 @@
 // src/components/Header.tsx
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
@@ -45,6 +46,16 @@ const AppBar = styled(MuiAppBar, {
 const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { selectedStoreId, setSelectedStoreId } = useSelectedStore();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (user?.storeList?.length) {
+      const storeIds = user.storeList.map(store => store.id);
+      if (!selectedStoreId || !storeIds.includes(selectedStoreId)) {
+        setSelectedStoreId(user.storeList[0].id);
+      }
+    }
+  }, [user?.storeList, selectedStoreId, setSelectedStoreId]);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -53,8 +64,6 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
     setAnchorEl(null);
   };
   const openMenu = Boolean(anchorEl);
-
-  const {user} = useAuthStore();
 
   return (
     <AppBar position="fixed" open={open}
@@ -94,23 +103,23 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       {store 
                       ?                       
-                      <Avatar sx={{ bgcolor: "green", width: 30, height: 30 }}>
+                      <Avatar src={`http://localhost:8080/api${store?.fileUrl}`} sx={{ bgcolor: "green", width: 30, height: 30 }}>
                         <StoreIcon fontSize="small" />
                       </Avatar>
                       :
                       <></>
                       }
-                      <Typography sx={{ ml: 1 }}>{store?.storeName ?? '가게를 선택해주세요'}</Typography>
+                      <Typography sx={{ ml: 1 }}>{store?.storeName ?? (user?.storeList?.length === 0 ? '매장을 추가해주세요' : '매장을 선택해주세요')}</Typography>
                     </Box>
                   );
                 }}
               >
-                {Array.isArray(user?.storeList) 
+                {user && Array.isArray(user.storeList) && user.storeList.length > 0
                 ?
                   user?.storeList.map((store) => (
                     <MenuItem key={store.id} value={store.id}>
                       <Box sx={{display : 'flex', alignItems : 'center'}}>
-                        <Avatar sx={{ bgcolor: "green", width: 30, height: 30 }}>
+                        <Avatar src={`http://localhost:8080/api${store?.fileUrl}`} sx={{ bgcolor: "green", width: 30, height: 30 }}>
                           <StoreIcon fontSize='small'/>
                         </Avatar>
                       </Box>
@@ -119,22 +128,24 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                   ))
                   :
                   <MenuItem key={"noStore"} value={-1}>
-                  <ListItemText sx={{ml : 1}}>우리가게를 추가해주세요</ListItemText>
+                  <ListItemText sx={{ml : 1}}>매장을 추가해주세요</ListItemText>
                 </MenuItem>
                 }
               </Select>
             </FormControl>
-            <Tooltip title="가게 추가" arrow >
-              <IconButton
-                size="large"
-                edge="end"
-                color="inherit"
-                aria-label="addStore"
-                sx={{ ml: 1 }}
-              >
-                <AddStoreButton />
-              </IconButton>
-            </Tooltip>
+              <Link to='/store/create'>
+              <Tooltip title="가게 추가" arrow >
+                <IconButton
+                  size="large"
+                  edge="end"
+                  //color="inherit"
+                  aria-label="addStore"
+                  sx={{ ml: 1 }}
+                >
+                  <AddStoreButton />
+                </IconButton>
+                </Tooltip>
+              </Link>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box onClick={handleAvatarClick} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mr: 3 }} >
@@ -162,7 +173,7 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
               horizontal: 'left',
             }}
             >
-              <MenuItem>
+              <MenuItem component={Link} to={'/mypage'}>
                 <PersonIcon />
                 <ListItemText sx={{ml : 1}}>내 정보</ListItemText>
               </MenuItem>

@@ -95,7 +95,7 @@ const menuItems2 = [
 // Sidebar 컴포넌트 정의
 export default function Sidebar() {
   const theme = useTheme(); // 현재 테마 사용
-  const [open, setOpen] = React.useState(false); // Drawer의 열림 상태 관리
+  const [open, setOpen] = React.useState(true); // Drawer의 열림 상태 관리
 
   // Drawer 열기 핸들러
   const handleDrawerOpen = () => {

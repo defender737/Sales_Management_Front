@@ -36,7 +36,7 @@ export type Store = {
     roadAdress? : string;
     detailAdress? : string;
     zipCode? :string;
-    imageUrl?: string;
+    fileUrl?: string;
   };
 
   export type storeForm = Omit<SalesRecord, 'id'>;
@@ -45,5 +45,7 @@ export type initUser = {
     id: number;
     name: string;
     email: string;
+    phone : string;
+    authProvider : string,
     storeList: Store[];
   };
