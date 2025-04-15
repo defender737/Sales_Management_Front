@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -20,6 +20,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Header from './Header';
 import { Typography } from '@mui/material';
+import { useSidebarStatus } from '../stores/UseSidebarStatusStore'
 const drawerWidth = 240; // Drawer의 너비를 정의
 
 // Drawer가 열릴 때의 스타일을 정의
@@ -81,116 +82,117 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const menuItems1 = [
-  { text: "매출/지출 기록", icon: <MonetizationOnIcon />, path : "/sales-expenses" },
-  { text: "메출 통계", icon: <BarChartIcon />, path : "/Login" },
-  { text: "순매출 관리", icon: <SettingsIcon />, path : "/" }
+  { text: "매출/지출 기록", icon: <MonetizationOnIcon />, path: "/sales-expenses" },
+  { text: "메출 통계", icon: <BarChartIcon />, path: "/Login" },
+  { text: "순매출 관리", icon: <SettingsIcon />, path: "/" }
 ];
 
 const menuItems2 = [
-  { text: "보고서", icon: <ReceiptIcon />, path : "/" },
-  { text: "지원", icon: <HelpOutlineIcon />, path : "/" },
-  { text: "설정", icon: <SettingsIcon />, path : "/" }
+  { text: "보고서", icon: <ReceiptIcon />, path: "/" },
+  { text: "지원", icon: <HelpOutlineIcon />, path: "/" },
+  { text: "설정", icon: <SettingsIcon />, path: "/" }
 ];
 
 // Sidebar 컴포넌트 정의
 export default function Sidebar() {
   const theme = useTheme(); // 현재 테마 사용
-  const [open, setOpen] = React.useState(true); // Drawer의 열림 상태 관리
+  const { sidebarOpen, setSideBarOpen } = useSidebarStatus();
+  //const [open, setOpen] = useState(true); // Drawer의 열림 상태 관리
 
   // Drawer 열기 핸들러
   const handleDrawerOpen = () => {
-    setOpen(true);
+    setSideBarOpen(true);
   };
 
   // Drawer 닫기 핸들러
   const handleDrawerClose = () => {
-    setOpen(false);
+    setSideBarOpen(false);
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
-     <Header open={open} handleDrawerOpen={handleDrawerOpen} /> 
-      <Drawer variant="permanent" open={open}> {/* Drawer의 open 상태에 따라 스타일 변경 */}
-      <DrawerHeader sx={{ justifyContent: 'space-between' }}>
-  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-    {open && (
-      <Typography variant="h6" noWrap component="div" sx={{ ml: 2 }}>
-        Menu
-      </Typography>
-    )}
-  </Box>
-  <IconButton onClick={handleDrawerClose}>
-    {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-  </IconButton>
-</DrawerHeader>
+      <Header open={sidebarOpen} handleDrawerOpen={handleDrawerOpen} />
+      <Drawer variant="permanent" open={sidebarOpen}> {/* Drawer의 open 상태에 따라 스타일 변경 */}
+        <DrawerHeader sx={{ justifyContent: 'space-between' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {sidebarOpen && (
+              <Typography variant="h2" component="div" sx={{ ml: 2 }}>
+                Menu
+              </Typography>
+            )}
+          </Box>
+          <IconButton onClick={handleDrawerClose}>
+            {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+          </IconButton>
+        </DrawerHeader>
         <Divider />
         <List>
-            <ListItem key={"대시보드"} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
+          <ListItem key={"대시보드"} disablePadding sx={{ display: 'block' }}>
+            <ListItemButton
+              sx={[
+                {
+                  minHeight: 48,
+                  px: 2.5,
+                },
+                sidebarOpen
+                  ? {
+                    justifyContent: 'initial', // Drawer가 열리면 초기 정렬
+                  }
+                  : {
+                    justifyContent: 'center', // Drawer가 닫히면 중앙 정렬
+                  },
+              ]}
+            >
+              <ListItemIcon
                 sx={[
                   {
-                    minHeight: 48,
-                    px: 2.5,
+                    minWidth: 0,
+                    justifyContent: 'center', // 아이콘 중앙 정렬
                   },
-                  open
+                  sidebarOpen
                     ? {
-                        justifyContent: 'initial', // Drawer가 열리면 초기 정렬
-                      }
+                      mr: 3, // Drawer가 열리면 오른쪽 여백 추가
+                    }
                     : {
-                        justifyContent: 'center', // Drawer가 닫히면 중앙 정렬
-                      },
+                      mr: 'auto', // Drawer가 닫히면 자동 여백
+                    },
                 ]}
               >
-                <ListItemIcon
-                  sx={[
-                    {
-                      minWidth: 0,
-                      justifyContent: 'center', // 아이콘 중앙 정렬
+                <DashboardIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary={"대시보드"}
+                sx={[
+                  sidebarOpen
+                    ? {
+                      opacity: 1, // Drawer가 열리면 텍스트 보임
+                    }
+                    : {
+                      opacity: 0, // Drawer가 닫히면 텍스트 숨김
                     },
-                    open
-                      ? {
-                          mr: 3, // Drawer가 열리면 오른쪽 여백 추가
-                        }
-                      : {
-                          mr: 'auto', // Drawer가 닫히면 자동 여백
-                        },
-                  ]}
-                >
-                  <DashboardIcon />
-                </ListItemIcon>
-                <ListItemText
-                  primary={"대시보드"}
-                  sx={[
-                    open
-                      ? {
-                          opacity: 1, // Drawer가 열리면 텍스트 보임
-                        }
-                      : {
-                          opacity: 0, // Drawer가 닫히면 텍스트 숨김
-                        },
-                  ]}
-                />
-              </ListItemButton>
-            </ListItem>
+                ]}
+              />
+            </ListItemButton>
+          </ListItem>
         </List>
         <Divider />
         <List>
           {/* 반복되는 리스트 항목 렌더링 */}
-          {menuItems1.map(({text, icon, path}) => (
+          {menuItems1.map(({ text, icon, path }) => (
             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton component = {Link} to={path}
+              <ListItemButton component={Link} to={path}
                 sx={[
                   {
                     minHeight: 48,
                     px: 2.5,
                   },
-                  open
+                  sidebarOpen
                     ? {
-                        justifyContent: 'initial', // Drawer가 열리면 초기 정렬
-                      }
+                      justifyContent: 'initial', // Drawer가 열리면 초기 정렬
+                    }
                     : {
-                        justifyContent: 'center', // Drawer가 닫히면 중앙 정렬
-                      },
+                      justifyContent: 'center', // Drawer가 닫히면 중앙 정렬
+                    },
                 ]}
               >
                 <ListItemIcon
@@ -199,13 +201,13 @@ export default function Sidebar() {
                       minWidth: 0,
                       justifyContent: 'center', // 아이콘 중앙 정렬
                     },
-                    open
+                    sidebarOpen
                       ? {
-                          mr: 3, // Drawer가 열리면 오른쪽 여백 추가
-                        }
+                        mr: 3, // Drawer가 열리면 오른쪽 여백 추가
+                      }
                       : {
-                          mr: 'auto', // Drawer가 닫히면 자동 여백
-                        },
+                        mr: 'auto', // Drawer가 닫히면 자동 여백
+                      },
                   ]}
                 >
                   {icon}
@@ -213,13 +215,13 @@ export default function Sidebar() {
                 <ListItemText
                   primary={text}
                   sx={[
-                    open
+                    sidebarOpen
                       ? {
-                          opacity: 1, // Drawer가 열리면 텍스트 보임
-                        }
+                        opacity: 1, // Drawer가 열리면 텍스트 보임
+                      }
                       : {
-                          opacity: 0, // Drawer가 닫히면 텍스트 숨김
-                        },
+                        opacity: 0, // Drawer가 닫히면 텍스트 숨김
+                      },
                   ]}
                 />
               </ListItemButton>
@@ -228,21 +230,21 @@ export default function Sidebar() {
         </List>
         <Divider />
         <List>
-          {menuItems2.map(({text, icon, path}) => (
+          {menuItems2.map(({ text, icon, path }) => (
             <ListItem key={text} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton component = {Link} to={path}
+              <ListItemButton component={Link} to={path}
                 sx={[
                   {
                     minHeight: 48,
                     px: 2.5,
                   },
-                  open
+                  sidebarOpen
                     ? {
-                        justifyContent: 'initial', // Drawer가 열리면 초기 정렬
-                      }
+                      justifyContent: 'initial', // Drawer가 열리면 초기 정렬
+                    }
                     : {
-                        justifyContent: 'center', // Drawer가 닫히면 중앙 정렬
-                      },
+                      justifyContent: 'center', // Drawer가 닫히면 중앙 정렬
+                    },
                 ]}
               >
                 <ListItemIcon
@@ -251,13 +253,13 @@ export default function Sidebar() {
                       minWidth: 0,
                       justifyContent: 'center', // 아이콘 중앙 정렬
                     },
-                    open
+                    sidebarOpen
                       ? {
-                          mr: 3, // Drawer가 열리면 오른쪽 여백 추가
-                        }
+                        mr: 3, // Drawer가 열리면 오른쪽 여백 추가
+                      }
                       : {
-                          mr: 'auto', // Drawer가 닫히면 자동 여백
-                        },
+                        mr: 'auto', // Drawer가 닫히면 자동 여백
+                      },
                   ]}
                 >
                   {icon}
@@ -265,13 +267,13 @@ export default function Sidebar() {
                 <ListItemText
                   primary={text}
                   sx={[
-                    open
+                    sidebarOpen
                       ? {
-                          opacity: 1, // Drawer가 열리면 텍스트 보임
-                        }
+                        opacity: 1, // Drawer가 열리면 텍스트 보임
+                      }
                       : {
-                          opacity: 0, // Drawer가 닫히면 텍스트 숨김
-                        },
+                        opacity: 0, // Drawer가 닫히면 텍스트 숨김
+                      },
                   ]}
                 />
               </ListItemButton>

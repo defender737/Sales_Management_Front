@@ -48,4 +48,6 @@ export type initUser = {
     phone : string;
     authProvider : string,
     storeList: Store[];
+    fileUrl?: string;
+    isEmailConsent : boolean;
   };

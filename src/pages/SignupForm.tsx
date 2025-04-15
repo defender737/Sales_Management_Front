@@ -30,7 +30,7 @@ import {
 } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Modal from '../components/Modal'
+import AlertModal from '../components/AlertModal'
 import { SnackbarContext } from '../contexts/SnackbarContext';
 
 
@@ -315,7 +315,7 @@ export default function SignupForm() {
 
                             <Box>
                                 <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                                    연락처
+                                    전화번호
                                     <Typography component="span" color="error" sx={{ ml: 0.5 }}>
                                         *
                                     </Typography>
@@ -410,19 +410,13 @@ export default function SignupForm() {
                     </Paper>
                 </Box>
             </form>
-            <Modal open={modalOpen} handleClose={handleClose} title={{ title: '회원가입 완료', subTitle: "" }}>
-                <Box sx={{ p: 4, textAlign: 'center' }}>
-                    <Typography variant="h4" sx={{ mb: 2 }}>
-                        회원가입이 완료되었습니다.
-                    </Typography>
-                    <Typography variant="body1" sx={{ mb: 4 }}>
-                        환영합니다! 이제 서비스를 이용하실 수 있습니다.
-                    </Typography>
-                    <Button variant="contained" color="primary" onClick={redirectToLogin}>
-                        로그인 화면으로 돌아가기
-                    </Button>
-                </Box>
-            </Modal>
+            <AlertModal 
+              open={modalOpen}
+              buttonCount={1}
+              onClose={redirectToLogin}
+              content='회원가입을 완료했습니다.'
+              confirmText='로그인 화면으로 돌아가기'
+              />
         </>
     );
 }

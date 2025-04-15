@@ -3,6 +3,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { PaletteMode } from '@mui/material';
 
 declare module "@mui/material/styles" {
+
   interface Theme {
     custom: {
       drawerWidth: number;
@@ -27,80 +28,37 @@ const drawerWidth = 240;
 const lightPalette = {
   mode: 'light' as PaletteMode,
   primary: {
-    light: '#DBE2EF',
-    main: '#3F72AF',
-    dark: '#112D4E',
+    main: '#46557F',
   },
   secondary: {
-    main: '#DBE2EF',
-  },
-  background: {
-    default: '#F9F7F7',
-    paper: '#ffffff',
-  },
-  text: {
-    primary: '#000000',
-  },
-  error: {
-    main: '#D32F2F',     // 강한 빨강 (기본 MUI error)
-    light: '#FFCDD2',
-    dark: '#C62828',
-    contrastText: '#fff',
-  },
-  warning: {
-    main: '#FFA000',
-    light: '#FFE082',
-    dark: '#FF6F00',
-    contrastText: '#000',
-  },
-  info: {
-    main: '#0288D1',
-    light: '#B3E5FC',
-    dark: '#01579B',
-    contrastText: '#fff',
-  },
-  success: {
-    main: '#388E3C',
-    light: '#C8E6C9',
-    dark: '#2E7D32',
-    contrastText: '#fff',
-  },
+    main: '#AB47BC',
+  }
 };
 
-// 다크 테마 팔레트
-const darkPalette = {
-  mode: 'dark' as PaletteMode,
-  primary: {
-    light: '#5f9df7',
-    main: '#3F72AF',
-    dark: '#0e1a3d',
-  },
-  secondary: {
-    main: '#607D8B',
-  },
-  background: {
-    default: '#121212',
-    paper: '#1e1e1e',
-  },
-  text: {
-    primary: '#ffffff',
-  },
-};
-
-// 현재는 라이트 테마로 설정
+// 현재는 라이트 테마만 사용
 const theme = createTheme({
-  palette: lightPalette,
+  palette: {
+    ...lightPalette
+  },
   typography: {
     h1: {
       fontSize: '2rem',
       fontWeight: 'bold',
     },
+    h2: {
+      fontSize: '1.6rem',
+      fontWeight: 'normal',
+    },
     body1: {
       fontSize: '1rem',
+      fontWeight : 'normal'
     },
+    body2 : {
+      fontSize : '0.8rem'
+    }
   },
   shape: {
-    borderRadius: 4, // ← 원하는 radius 값
+    borderRadius: 4,
   },
   custom: {
     drawerWidth,

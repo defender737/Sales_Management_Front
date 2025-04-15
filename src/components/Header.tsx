@@ -1,4 +1,3 @@
-// src/components/Header.tsx
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
@@ -7,7 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
 import StoreIcon from '@mui/icons-material/Store';
-import { FormControl, InputLabel, Select, MenuItem, Box, Toolbar, Typography, Avatar, Button, Tooltip, Menu, Divider, ListItemText } from '@mui/material';
+import { FormControl, Select, MenuItem, Box, Toolbar, Typography, Avatar, Tooltip, Menu, Divider, ListItemText } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuthStore } from '../stores/UseAuthStore';
 import AddStoreButton from '@mui/icons-material/AddBusiness'
@@ -88,9 +87,18 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
         </IconButton>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Typography variant="h6" noWrap component="div">
-              Tally
-            </Typography>
+          <Typography
+            component={Link}
+            to="/"
+            variant="h6"
+            noWrap
+            sx={{
+              textDecoration: 'none',
+              color: 'inherit',
+            }}
+          >
+            Tally
+          </Typography>
             <FormControl sx={{ minWidth: 300, ml: 4}} size="small">
               <Select
                 id="storeSelect"
@@ -103,7 +111,7 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       {store 
                       ?                       
-                      <Avatar src={`http://localhost:8080/api${store?.fileUrl}`} sx={{ bgcolor: "green", width: 30, height: 30 }}>
+                      <Avatar src={store?.fileUrl ? `http://localhost:8080/api${store.fileUrl}` : undefined} sx={{width: 30, height: 30,}}>
                         <StoreIcon fontSize="small" />
                       </Avatar>
                       :
@@ -119,7 +127,7 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                   user?.storeList.map((store) => (
                     <MenuItem key={store.id} value={store.id}>
                       <Box sx={{display : 'flex', alignItems : 'center'}}>
-                        <Avatar src={`http://localhost:8080/api${store?.fileUrl}`} sx={{ bgcolor: "green", width: 30, height: 30 }}>
+                        <Avatar src={`http://localhost:8080/api${store?.fileUrl}`} sx={{ width: 30, height: 30 }}>
                           <StoreIcon fontSize='small'/>
                         </Avatar>
                       </Box>
@@ -133,23 +141,25 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                 }
               </Select>
             </FormControl>
-              <Link to='/store/create'>
               <Tooltip title="가게 추가" arrow >
                 <IconButton
+                  component = {Link}
+                  to = {'/store/create'}
                   size="large"
                   edge="end"
-                  //color="inherit"
+                  color="primary"
                   aria-label="addStore"
                   sx={{ ml: 1 }}
                 >
                   <AddStoreButton />
                 </IconButton>
                 </Tooltip>
-              </Link>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box onClick={handleAvatarClick} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mr: 3 }} >
-              <Avatar sx={{ bgcolor: "orange" }}>
+              <Avatar 
+                src={user?.fileUrl ? `http://localhost:8080/api${user.fileUrl}` : undefined}
+                sx={{ bgcolor: "orange" }}>
                 {user?.name?.charAt(0) ?? 'U'}
               </Avatar>
               <Box sx={{ ml: 1 }}>
@@ -173,12 +183,12 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
               horizontal: 'left',
             }}
             >
-              <MenuItem component={Link} to={'/mypage'}>
+              <MenuItem component={Link} to={'/mypage'} onClick={handleMenuClose}>
                 <PersonIcon />
                 <ListItemText sx={{ml : 1}}>내 정보</ListItemText>
               </MenuItem>
               <Divider />
-              <MenuItem>
+              <MenuItem  onClick={handleMenuClose}>
                 <StoreIcon />
                 <ListItemText sx={{ml : 1}}>내 가게 정보</ListItemText>
               </MenuItem>

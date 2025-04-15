@@ -315,7 +315,7 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
                     <Button type="submit" disabled={deleteLoading || editLoading} variant="contained" color="error" onClick={handleDelete} sx={{ minHeight: 40, minWidth: 100 ,mr : 2}}>
                         {deleteLoading ? <CircularProgress size={25} color="inherit" /> : deleteSuccess ? <CheckIcon /> : "삭제"}
                     </Button>
-                    <Button type="submit" disabled={deleteLoading || editLoading} variant="contained" color="info" onClick={handleUpdate} sx={{ minHeight: 40, minWidth: 100 }}>
+                    <Button type="submit" disabled={deleteLoading || editLoading} variant="contained" color="primary" onClick={handleUpdate} sx={{ minHeight: 40, minWidth: 100 }}>
                         {editLoading ? <CircularProgress size={25} color="inherit" /> : editSuccess ? <CheckIcon /> : "수정"}
                     </Button>
                 </Box>

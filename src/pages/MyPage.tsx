@@ -12,14 +12,17 @@ import {
 import { useState, useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import PageTitle from '../components/PageTitle'
-import Modal from '../components/Modal'
-import { updateUser, initUserData } from '../api/api'
+import { updateUser, initUserData, updateEmailConsent } from '../api/api'
 import axios from 'axios';
 import { SnackbarContext } from '../contexts/SnackbarContext'
 import { useAuthStore } from '../stores/UseAuthStore'
 import SmartPhoneIcon from "@mui/icons-material/Smartphone"
 import EmailIcon from "@mui/icons-material/MailOutline"
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+
+import AlertModal from '../components/AlertModal';
+import Modal from "../components/Modal"
+import ModalContent from "../components/UpdatePasswordForm"
 
 
 const pageTitle = {
@@ -40,6 +43,9 @@ export default function MyPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const showSnackbar = useContext(SnackbarContext);
   const {user, setUser} = useAuthStore();
+  const [emailConsent, setEmailConsent] = useState(user?.isEmailConsent ?? false);
+  const [alertModalOpen, setAlertModalOpen] = useState(false);
+  const [formModalOpen, setFormModalOpen] = useState(false)
 
   const onSubmit = async (data: any) => {
     console.log('유저 수정 :', data);
@@ -47,6 +53,7 @@ export default function MyPage() {
       try {
         const response = await updateUser(user?.id, data, imageFile);
         console.log(response)
+        setAlertModalOpen(true);
         showSnackbar("사용자 정보를 수정했습니다.", "success");
         const updatedUser = await initUserData();
         setUser(updatedUser.data);
@@ -59,6 +66,37 @@ export default function MyPage() {
       }
     }
   };
+
+  const handleConsentChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    checked: boolean
+  ) => {
+    const prevValue = emailConsent;
+    setEmailConsent(checked);
+  
+    if (user && user.id) {
+      if (event.target.name === "emailConsent") {
+        try {
+          await updateEmailConsent(user.id, checked);
+          const message = checked
+            ? "프로모션 이메일 수신에 동의하셨습니다."
+            : "프로모션 이메일 수신 동의를 해제하였습니다";
+          showSnackbar(message, "success");
+        } catch (error) {
+          setEmailConsent(prevValue);
+          if (axios.isAxiosError(error)) {
+            const message =
+              error.response?.data.details ?? "프로모션 이메일 수신 동의 상태 변경에 실패했습니다";
+            showSnackbar(message, "error");
+          }
+        }
+      }
+    }
+  };
+
+  const handleUpdatePasswordButton = () => {
+    setFormModalOpen(true);
+  }
 
   return (
     <Box sx={{ mx: 'auto' }}>
@@ -77,12 +115,12 @@ export default function MyPage() {
         maxWidth: 'none !important',
         minWidth: '320px',
       }}>
-        <Typography variant="h5" fontWeight="" gutterBottom>기본 정보</Typography>
+        <Typography variant="h2" gutterBottom>기본 정보</Typography>
         <Divider />
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center', alignItems: 'center', ml: 3 }}>
             <Avatar
-              src={previewUrl ? previewUrl : ''}
+              src={previewUrl ? previewUrl : (user?.fileUrl ? `http://localhost:8080/api${user.fileUrl}` : undefined)}
               alt='유저 이미지 미리보기'
               sx={{ width: 250, height: 250 }}
             ></Avatar>
@@ -111,10 +149,10 @@ export default function MyPage() {
             sx={{ mt: 4, display: 'flex', flexDirection: 'column', gap: 2, width: '100%', mr: 3 }}
           >
             <Typography variant="body1" fontWeight="bold" >이메일</Typography>
-            <Typography variant="body2" color="textSecondary" gutterBottom fontSize={16}>{user?.email}</Typography>
+            <Typography variant="body2" color="textSecondary" gutterBottom fontSize={'1rem'}>{user?.email}</Typography>
 
             <Typography variant="body1" fontWeight="bold">로그인 유형</Typography>
-            <Typography variant="body2" color="textSecondary" gutterBottom fontSize={16}>
+            <Typography variant="body2" color="textSecondary" gutterBottom fontSize={'1rem'}>
               {user?.authProvider && user.authProvider in loginType
                 ? `${loginType[user.authProvider as keyof typeof loginType]} 로그인`
                 : '알 수 없음'}
@@ -141,11 +179,19 @@ export default function MyPage() {
               control={control}
               defaultValue={user?.phone || ""}
               render={({ field }) => (
-                <TextField {...field} required sx={{ minWidth: 500, maxWidth: 1000, width: '30%' }} />
+                <TextField 
+                {...field}
+                required 
+                sx={{ minWidth: 500, maxWidth: 1000, width: '30%' }}
+                onChange={(e) => {
+                  const digitsOnly = e.target.value.replace(/\D/g, '');
+                  field.onChange(digitsOnly);
+              }}
+                />
               )}
             />
             <Box sx={{ display: 'flex', width: "100%", justifyContent: 'flex-end', gap: 2 }}>
-              <Button type="submit" variant="contained" color="primary" size='large' sx={{ width: 150 }}>
+              <Button onClick={handleUpdatePasswordButton} variant="contained" color="primary" size='large' sx={{ width: 150 }}>
                 비밀번호 변경
               </Button>
               <Button type="submit" variant="contained" color="primary" size='large' sx={{ width: 150 }}>
@@ -169,16 +215,19 @@ export default function MyPage() {
         maxWidth: 'none !important',
         minWidth: '320px',
       }}>
-        <Typography variant="h5" fontWeight="" gutterBottom>프로모션 정보 수신 동의</Typography>
+        <Typography variant="h2" gutterBottom>프로모션 정보 수신 동의</Typography>
         <Divider></Divider>
         <Box>
 
           <Box sx={{ display: 'flex', p: 1, justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: "flex", gap: 1, alignItems: 'center' }}>
               <EmailIcon />
-              <Typography variant="body1" fontWeight="bold">이메일</Typography>
+              <Typography variant="body1">이메일</Typography>
             </Box>
-            <Switch></Switch>
+            <Switch
+            checked = {emailConsent} 
+            name='emailConsent'
+            onChange={handleConsentChange}></Switch>
           </Box>
 
           <Divider />
@@ -186,9 +235,11 @@ export default function MyPage() {
           <Box sx={{ display: 'flex', p: 1, justifyContent: 'space-between', alignItems: 'center' }}>
             <Box sx={{ display: "flex", gap: 1, alignItems: 'center' }}>
               <SmartPhoneIcon />
-              <Typography variant="body1" fontWeight="bold">전화번호</Typography>
+              <Typography variant="body1">전화번호</Typography>
             </Box>
-            <Switch disabled></Switch>
+            <Switch
+            name='phoneConsent'
+            disabled></Switch>
           </Box>
         </Box>
       </Container>
@@ -196,6 +247,20 @@ export default function MyPage() {
         <ArrowBackIosNewIcon fontSize="small" sx={{ color: 'gray' }} />
           회원 탈퇴
         </Button>
+        <AlertModal 
+          open={alertModalOpen}
+          buttonCount={1}
+          onClose={() => {setAlertModalOpen(false)}}
+          content='정보를 성공적으로 수정했습니다.'
+          />
+          <Modal open={formModalOpen} handleClose={() => {setFormModalOpen(false)}}
+            title={
+              {title : '비밀번호 변경하기', subTitle : ''}
+              }>
+              <ModalContent
+              handleClose={() => {setFormModalOpen(false)}}
+              />
+          </Modal>
     </Box>
   );
 }

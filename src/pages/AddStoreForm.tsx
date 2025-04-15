@@ -19,6 +19,7 @@ import axios from 'axios';
 import {SnackbarContext} from '../contexts/SnackbarContext'
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from '../stores/UseAuthStore'
+import AlertModal from '../components/AlertModal';
 
 
 const pageTitle = {
@@ -49,13 +50,10 @@ export default function AddStoreForm() {
     const handlePostCodeClose = () => {
         setOpenPostcode(false);
     }
-    const redirectToMain = () => {
+    const resultModalClose = () => {
       setOpenResultModal(false);
       navigate('/');
      };
-    const resultModalClose = () => {
-      setOpenResultModal(false);
-    }
     const selectAddress = (data: any) => {
         const { roadAddress, zonecode, buildingName } = data;
         const fullAddress = buildingName && buildingName !== ''
@@ -218,19 +216,12 @@ export default function AddStoreForm() {
                     height: '600px'
                 }} />
             </Modal>
-             <Modal open = {openResultModal} handleClose={resultModalClose} title={{title :'매장 추가 완료', subTitle : ""}}>
-                        <Box sx={{ p: 4, textAlign: 'center' }}>
-                            <Typography variant="h4" sx={{ mb: 2 }}>
-                                새로운 매장이 등록되었습니다.
-                            </Typography>
-                            {/* <Typography variant="body1" sx={{ mb: 4 }}>
-                                새로운 매장을 관리해보세요.
-                            </Typography> */}
-                            <Button variant="contained" color="primary" onClick={redirectToMain}>
-                                메인으로 돌아가기
-                            </Button>
-                        </Box>
-                    </Modal>
+            <AlertModal 
+              open={openResultModal}
+              buttonCount={1}
+              onClose={resultModalClose}
+              content='매장을 추가했습니다.'
+              />
         </Box>
     );
 }

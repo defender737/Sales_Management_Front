@@ -205,3 +205,11 @@ export const updateUser = (id: number, userData : {name: string, phone: string},
     }
   });
 }
+
+export const updateEmailConsent = (id: number, emailConsent : boolean) => {
+  return api.patch(`user/emailConsent/${id}`, emailConsent);
+}
+
+export const updatePassword = (passwordData : {currentPassword : string, newPassword : string}) => {
+  return api.patch('auth/password', passwordData)
+}
