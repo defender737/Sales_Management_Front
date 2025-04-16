@@ -20,6 +20,7 @@ import {createSalesRecord, getSalesRecords, editSalesRecord, deleteSalesRecord} 
 import {SalesRecordForm} from '../types/types'
 import { SnackbarContext } from '../contexts/SnackbarContext';
 import {snackMessages} from '../constants/messages'
+import {useSelectedStore} from '../stores/UseSelectedStore'
 import axios from 'axios';
 
 // 금액에 콤마 추가
@@ -41,7 +42,6 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
     const isEdit = mode === 'edit';
 
     const [formData, setFormData] = React.useState<SalesRecordForm>({
-        storeId : 1,
         amount: 0,
         date: new Date().toISOString().split('T')[0],
         type: 'SALES',
@@ -55,6 +55,7 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
     const [createSuccess, setCreateSuccess] = React.useState(false);
     const [editSuccess, setEditSuccess] = React.useState(false);
     const [deleteSuccess, setDeleteSuccess] = React.useState(false);
+    const {selectedStoreId} = useSelectedStore();
     const showSnackbar = React.useContext(SnackbarContext)
 
     React.useEffect(() => {
@@ -63,7 +64,6 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
             try {
               const response = await getSalesRecords(rowId);
               setFormData({
-                storeId: response.data.storeId,
                 amount: response.data.amount,
                 date: response.data.date,
                 type: response.data.type === "매출" ? "SALES" : "EXPENSES",
@@ -111,28 +111,31 @@ const RecordAddForm = ({mode, handleSubbmitAndClose, rowId} : RecordFormProps) =
     const minDelay = 500;
 
     const handleCreate = async () => {
-
-        const startTime = Date.now();
-        setCreateLoading(true);
-        try {
-          const response = await createSalesRecord(formData);
-          console.log('생성 성공:', response);
-
-          const elapsed = Date.now() - startTime;
-          const delay = Math.max(0, minDelay - elapsed);
-
-          setCreateSuccess(true);
-           setTimeout(() => {
-            setCreateLoading(false);
+        if(selectedStoreId){
+          const startTime = Date.now();
+          setCreateLoading(true);
+          try {
+            const response = await createSalesRecord(selectedStoreId, formData);
+            console.log('생성 성공:', response);
+  
+            const elapsed = Date.now() - startTime;
+            const delay = Math.max(0, minDelay - elapsed);
+  
             setCreateSuccess(true);
-            showSnackbar(snackMessages.create.success('기록'), "success");
-            setTimeout(() => handleSubbmitAndClose(), 1500);
-          }, delay);
-        } catch (error) {
-          console.error('생성 실패:', error);
-          showSnackbar(snackMessages.create.error('기록'), "error");
-          setCreateSuccess(false);
-          setCreateLoading(false);
+             setTimeout(() => {
+              setCreateLoading(false);
+              setCreateSuccess(true);
+              showSnackbar(snackMessages.create.success('기록'), "success");
+              setTimeout(() => handleSubbmitAndClose(), 1500);
+            }, delay);
+          } catch (error) {
+            console.error('생성 실패:', error);
+            showSnackbar(snackMessages.create.error('기록'), "error");
+            setCreateSuccess(false);
+            setCreateLoading(false);
+          }
+        }else{
+          showSnackbar("매장 정보를 찾을 수 없습니다.", "error");
         }
       };
       

@@ -1,6 +1,6 @@
 // src/api/api.ts
 import axios from 'axios';
-import {registerForm, storeForm} from '../types/types'
+import { registerForm, storeForm } from '../types/types'
 import { setAccessToken, getAccessToken } from '../stores/UseAuthStore'
 
 const api = axios.create({
@@ -12,10 +12,10 @@ const api = axios.create({
 });
 
 let isRefreshing = false;
-let failedQueue : any[] = [];
+let failedQueue: any[] = [];
 
-const processQueue = (error: any, token : string | null = null) => {
-  failedQueue.forEach((prom : any) => {
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom: any) => {
     if (error) {
       prom.reject(error);
     } else {
@@ -93,37 +93,36 @@ api.interceptors.request.use(
 
 // 매장별 매출 내역 조회
 export const getSalesRecordsList = (
-    storeId: number,
-    page: number,
-    size: number,
-    order: string,
-    type : string,
-    startDate?: string,
-    endDate?: string
-  ) => {
-    const params: any = {
-      storeId,
-      page,
-      size,
-      sortOrder: order,
-      type
-    };
-  
-    if (startDate && endDate) {
-      params.startDate = startDate;
-      params.endDate = endDate;
-    }
-  
-    return api.get('records', { params });
+  storeId: number,
+  page: number,
+  size: number,
+  order: string,
+  type: string,
+  startDate?: string,
+  endDate?: string
+) => {
+  const params: any = {
+    storeId,
+    page,
+    size,
+    sortOrder: order,
+    type
   };
 
-  export const getSalesRecords = (id : number) => {
-    return api.get(`records/${id}`)
+  if (startDate && endDate) {
+    params.startDate = startDate;
+    params.endDate = endDate;
   }
 
+  return api.get('records', { params });
+};
+
+export const getSalesRecords = (id: number) => {
+  return api.get(`records/${id}`)
+}
+
 // 매출/지출 기록 생성
-export const createSalesRecord = (record: {
-  storeId : number
+export const createSalesRecord = (storeId : number, record: {
   date: string;
   type: string;
   amount: number;
@@ -131,11 +130,10 @@ export const createSalesRecord = (record: {
   payment: string;
   etc: string;
 }) => {
-  return api.post('records', record);
+  return api.post(`records?storeId=${storeId}`, record);
 };
 
-export const editSalesRecord = (id : number, record : {
-  storeId : number
+export const editSalesRecord = (id: number, record: {
   date: string;
   type: string;
   amount: number;
@@ -146,70 +144,90 @@ export const editSalesRecord = (id : number, record : {
   return api.put(`records/${id}`, record)
 }
 
-export const deleteSalesRecord = (id : number) => {
+export const deleteSalesRecord = (id: number) => {
   return api.delete(`records/${id}`)
 }
 
-export const requestEmailVerification = (email : string) => {
+export const requestEmailVerification = (email: string) => {
   return api.post('auth/email/verify-request', { email })
 }
 
-export const requestEmailCodeVerification = (email : string, code: string) => {
+export const requestEmailCodeVerification = (email: string, code: string) => {
   return api.post('auth/email/verify-check', { email, code })
 }
 
-export const register = (registerForm : registerForm) => {
+export const register = (registerForm: registerForm) => {
   return api.post('auth/signup', registerForm)
 }
 
-export const login = (loginForm : {email: string, password: string}) => {
+export const login = (loginForm: { email: string, password: string }) => {
   return api.post('auth/login', loginForm)
 }
 
 export const reissueAccessToken = () => {
-  return api.post('auth/reissue', {},  {headers: { 'X-Reissue': 'true' }})
+  return api.post('auth/reissue', {}, { headers: { 'X-Reissue': 'true' } })
 }
 
 export const initUserData = () => {
   return api.get('user/me')
 }
 
-export const createStore = (storeData : storeForm, imageFile : File | null) => {
+export const createStore = (storeData: storeForm, imageFile: File | null) => {
   const formData = new FormData();
 
-  formData.append('store', new Blob([JSON.stringify(storeData)], {type : 'application/json'}));
+  formData.append('store', new Blob([JSON.stringify(storeData)], { type: 'application/json' }));
 
-  if(imageFile){
+  if (imageFile) {
     formData.append('image', imageFile);
   }
 
   return api.post('/store', formData, {
-    headers:{
-      'Content-Type' : 'multipart/form-data'
+    headers: {
+      'Content-Type': 'multipart/form-data'
     }
   });
 }
 
-export const updateUser = (id: number, userData : {name: string, phone: string}, imageFile : File | null) => {
+export const updateUser = (userData: { name: string, phone: string }, imageFile: File | null) => {
   const formData = new FormData();
 
-  formData.append('user', new Blob([JSON.stringify(userData)], {type: 'application/json'}));
+  formData.append('user', new Blob([JSON.stringify(userData)], { type: 'application/json' }));
 
-  if(imageFile){
+  if (imageFile) {
     formData.append('image', imageFile);
   }
 
-  return api.put(`user/${id}`, formData, {
-    headers:{
-      'Content-Type' : 'multipart/form-data'
+  return api.put(`user`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
     }
   });
 }
 
-export const updateEmailConsent = (id: number, emailConsent : boolean) => {
-  return api.patch(`user/emailConsent/${id}`, emailConsent);
+export const updateEmailConsent = (emailConsent: boolean) => {
+  return api.patch(`user/emailConsent`, emailConsent);
 }
 
-export const updatePassword = (passwordData : {currentPassword : string, newPassword : string}) => {
+export const updatePassword = (passwordData: { currentPassword: string, newPassword: string }) => {
   return api.patch('auth/password', passwordData)
+}
+
+export const updateStore = (storeId: number, storeData: storeForm, imageFile: File | null) => {
+  const formData = new FormData();
+
+  formData.append('store', new Blob([JSON.stringify(storeData)], { type: 'application/json' }));
+
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+
+  return api.put(`/store/${storeId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+}
+
+export const deleteStore = (id: number) => {
+  return api.delete(`store/${id}`)
 }

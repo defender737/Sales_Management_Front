@@ -144,7 +144,7 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
               <Tooltip title="가게 추가" arrow >
                 <IconButton
                   component = {Link}
-                  to = {'/store/create'}
+                  to = {'/myStore/create'}
                   size="large"
                   edge="end"
                   color="primary"
@@ -185,12 +185,12 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
             >
               <MenuItem component={Link} to={'/mypage'} onClick={handleMenuClose}>
                 <PersonIcon />
-                <ListItemText sx={{ml : 1}}>내 정보</ListItemText>
+                <ListItemText sx={{ml : 1}}>마이페이지</ListItemText>
               </MenuItem>
               <Divider />
-              <MenuItem  onClick={handleMenuClose}>
+              <MenuItem component={Link} to={'/myStore'}  onClick={handleMenuClose}>
                 <StoreIcon />
-                <ListItemText sx={{ml : 1}}>내 가게 정보</ListItemText>
+                <ListItemText sx={{ml : 1}}>마이스토어</ListItemText>
               </MenuItem>
             </Menu>
             <Tooltip title="로그아웃" arrow >

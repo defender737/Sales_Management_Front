@@ -5,8 +5,9 @@ import SalesExpenseRecords from "../pages/SalesExpenseRecords";
 import PrivateRoute from "./routingComponents/PrivateRoute";
 import {useAuthStore} from "../stores/UseAuthStore"
 import NoStorePromptPage from "../pages/NoStorePromptPage";
-import AddStoreForm from "../pages/AddStoreForm"
+import StoreForm from "../pages/StoreForm"
 import MyPage from "../pages/MyPage";
+import MyStore from "../pages/MyStore";
 
 const MainContent = () => {
   const { user } = useAuthStore();
@@ -19,8 +20,10 @@ const MainContent = () => {
     <Routes>
       <Route element={<PrivateRoute />}>
       <Route path="/sales-expenses" element={isStoreExsist ? <SalesExpenseRecords /> : <NoStorePromptPage />} />
-      <Route path="/store/create" element={<AddStoreForm />} />
+      <Route path="/myStore/create" element={<StoreForm />} />
+      <Route path="/myStore/edit/:id" element={<StoreForm />} />
       <Route path="/mypage" element={<MyPage />} />
+      <Route path="/myStore" element={<MyStore />} />
       </Route>
     </Routes>
   </Box>

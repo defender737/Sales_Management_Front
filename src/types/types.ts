@@ -1,7 +1,6 @@
 export interface SalesRecord {
     no?: number,
     id: number;
-    storeId: number;
     amount: number;
     date: string;
     type: string;
@@ -33,8 +32,9 @@ export type Store = {
     id: number;
     storeName: string;
     businessType: string;
-    roadAdress? : string;
-    detailAdress? : string;
+    roadAddress? : string;
+    detailAddress? : string;
+    description : string;
     zipCode? :string;
     fileUrl?: string;
   };

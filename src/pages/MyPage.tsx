@@ -38,7 +38,7 @@ const loginType = {
 };
 
 export default function MyPage() {
-  const { handleSubmit, control, setValue } = useForm();
+  const { handleSubmit, control } = useForm();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const showSnackbar = useContext(SnackbarContext);
@@ -51,7 +51,7 @@ export default function MyPage() {
     console.log('유저 수정 :', data);
     if(user && user.id){
       try {
-        const response = await updateUser(user?.id, data, imageFile);
+        const response = await updateUser(data, imageFile);
         console.log(response)
         setAlertModalOpen(true);
         showSnackbar("사용자 정보를 수정했습니다.", "success");
@@ -77,7 +77,7 @@ export default function MyPage() {
     if (user && user.id) {
       if (event.target.name === "emailConsent") {
         try {
-          await updateEmailConsent(user.id, checked);
+          await updateEmailConsent(checked);
           const message = checked
             ? "프로모션 이메일 수신에 동의하셨습니다."
             : "프로모션 이메일 수신 동의를 해제하였습니다";

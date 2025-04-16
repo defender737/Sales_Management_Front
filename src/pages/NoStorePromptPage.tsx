@@ -1,15 +1,9 @@
 // src/pages/NoStorePromptPage.tsx
 import { Box, Typography, Button } from '@mui/material';
 import StorefrontIcon from '@mui/icons-material/Storefront';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const NoStorePromptPage = () => {
-  const navigate = useNavigate();
-
-  const handleAddStoreClick = () => {
-    navigate('/store/create'); // 매장 생성 페이지 경로
-  };
-
   return (
     <Box
       sx={{
@@ -29,7 +23,7 @@ const NoStorePromptPage = () => {
       <Typography variant="subtitle1" sx={{ mb: 3 }}>
         매장을 추가하여 매출을 기록하고 관리해보세요.
       </Typography>
-      <Button variant="contained" color="primary" size="large" onClick={handleAddStoreClick}>
+      <Button variant="contained" color="primary" size="large" component={Link} to={'/myStore/create'}>
         매장 추가하기
       </Button>
     </Box>
