@@ -21,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuthStore } from '../stores/UseAuthStore'
 import AlertModal from '../components/AlertModal';
 import { useParams } from 'react-router-dom'
+import StoreIcon from '@mui/icons-material/Store';
+
 
 const pageTitleForCreate = {
   title: '매장 추가',
@@ -46,6 +48,7 @@ export default function AddStoreForm() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [openResultModal, setOpenResultModal] = useState(false);
+  const [openDeleteCautionModal, setOpenDeleteCautionModal] = useState(false);
   const showSnackbar = useContext(SnackbarContext);
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
@@ -93,6 +96,31 @@ export default function AddStoreForm() {
   const resultModalCloseforEdit = () => {
     setOpenResultModal(false);
   }
+  const deleteCautionModalonConfirm = async () => {
+    try {
+      const response = await deleteStore(Number(id));
+      console.log(response)
+      const message = "매장을 삭제했습니다."
+      showSnackbar(message, "success");
+
+      const updatedUser = await initUserData();
+      setUser(updatedUser.data);
+
+      //TODO : 뒤로가기
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        let message = (error.response?.data.details && error.response?.data.details !== undefined) ? error.response?.data.details : error.response?.data.message;
+        alert(message)
+        showSnackbar(message, "error");
+      }
+    }finally{
+      setOpenDeleteCautionModal(false);
+    }
+  }
+  const deleteCautionModalonClose= () => {
+    setOpenDeleteCautionModal(false);
+  }
+
   const selectAddress = (data: any) => {
     const { roadAddress, zonecode, buildingName } = data;
     const fullAddress = buildingName && buildingName !== ''
@@ -127,24 +155,8 @@ export default function AddStoreForm() {
     }
   };
 
-  const handleDeleteButton = async () => {
-    try {
-      const response = await deleteStore(Number(id));
-      console.log(response)
-      const message = "매장을 삭제했습니다."
-      showSnackbar(message, "success");
-
-      const updatedUser = await initUserData();
-      setUser(updatedUser.data);
-
-      //TODO : 뒤로가기
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        let message = (error.response?.data.details && error.response?.data.details !== undefined) ? error.response?.data.details : error.response?.data.message;
-        alert(message)
-        showSnackbar(message, "error");
-      }
-    }
+  const handleDeleteButton = () => {
+    setOpenDeleteCautionModal(true);
   }
 
   return (
@@ -169,7 +181,9 @@ export default function AddStoreForm() {
             src={previewUrl ? previewUrl : ''}
             alt='매장 이미지 미리보기'
             sx={{ width: 250, height: 250 }}
-          ></Avatar>
+          >
+            <StoreIcon sx={{fontSize : 150}}/>
+          </Avatar>
           <input
             accept="image/*"
             type="file"
@@ -284,6 +298,13 @@ export default function AddStoreForm() {
         buttonCount={1}
         onClose={isEdit ? resultModalCloseforEdit : resultModalCloseforCreate}
         content={isEdit ? "매장 정보를 수정했습니다." : "매장을 추가했습니다."}
+      />
+      <AlertModal
+        open={openDeleteCautionModal}
+        buttonCount={2}
+        onClose={deleteCautionModalonClose}
+        onConfirm={deleteCautionModalonConfirm}
+        content={"매장을 삭제하면 매장과 관련된 모든 정보가 삭제됩니다. \n 정말 삭제하시겠습니까?"}
       />
     </Box>
   );

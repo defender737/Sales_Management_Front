@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useContext } from 'react';
+import axios from 'axios'
+import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
@@ -11,6 +12,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuthStore } from '../stores/UseAuthStore';
 import AddStoreButton from '@mui/icons-material/AddBusiness'
 import {useSelectedStore} from '../stores/UseSelectedStore'
+import { SnackbarContext } from '../contexts/SnackbarContext';
+import {logout} from '../api/api'
 
 const drawerWidth = 240;
 
@@ -45,7 +48,9 @@ const AppBar = styled(MuiAppBar, {
 const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { selectedStoreId, setSelectedStoreId } = useSelectedStore();
-  const { user } = useAuthStore();
+  const { user, setUser, setAccessToken } = useAuthStore();
+  const showSnackbar = useContext(SnackbarContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.storeList?.length) {
@@ -63,6 +68,21 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
     setAnchorEl(null);
   };
   const openMenu = Boolean(anchorEl);
+
+  const logoutHandler = async () => {
+    try{
+      const respone = await logout();
+      console.log(respone.data)
+      setUser(null);
+      setAccessToken(null);
+      setSelectedStoreId(null);
+    }catch (error){
+      if (axios.isAxiosError(error)) {
+        let message = "로그아웃 실패";
+        showSnackbar(message, "error");
+      }
+    }
+  }
 
   return (
     <AppBar position="fixed" open={open}
@@ -200,6 +220,7 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                 color="inherit"
                 aria-label="logout"
                 sx={{ ml: 2 }}
+                onClick={logoutHandler}
               >
                 <LogoutIcon />
               </IconButton>

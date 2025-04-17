@@ -181,7 +181,7 @@ export const createStore = (storeData: storeForm, imageFile: File | null) => {
     formData.append('image', imageFile);
   }
 
-  return api.post('/store', formData, {
+  return api.post('store', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -221,7 +221,7 @@ export const updateStore = (storeId: number, storeData: storeForm, imageFile: Fi
     formData.append('image', imageFile);
   }
 
-  return api.put(`/store/${storeId}`, formData, {
+  return api.put(`store/${storeId}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -230,4 +230,12 @@ export const updateStore = (storeId: number, storeData: storeForm, imageFile: Fi
 
 export const deleteStore = (id: number) => {
   return api.delete(`store/${id}`)
+}
+
+export const logout = () => {
+  return api.post('/auth/logout');
+}
+
+export const withdraw = () => {
+  return api.delete('/user');
 }

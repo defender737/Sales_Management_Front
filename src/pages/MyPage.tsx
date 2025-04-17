@@ -42,14 +42,15 @@ export default function MyPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const showSnackbar = useContext(SnackbarContext);
-  const {user, setUser} = useAuthStore();
+  const { user, setUser } = useAuthStore();
   const [emailConsent, setEmailConsent] = useState(user?.isEmailConsent ?? false);
   const [alertModalOpen, setAlertModalOpen] = useState(false);
   const [formModalOpen, setFormModalOpen] = useState(false)
+  const [withdrawUserModalOpen, setWithdrawUserModalOpen] = useState(false);
 
   const onSubmit = async (data: any) => {
     console.log('유저 수정 :', data);
-    if(user && user.id){
+    if (user && user.id) {
       try {
         const response = await updateUser(data, imageFile);
         console.log(response)
@@ -60,7 +61,7 @@ export default function MyPage() {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           let message = (error.response?.data.details && error.response?.data.details !== undefined)
-          ? error.response?.data.details : "사용자 정보 수정에 실패했습니다.";
+            ? error.response?.data.details : "사용자 정보 수정에 실패했습니다.";
           showSnackbar(message, "error");
         }
       }
@@ -73,7 +74,7 @@ export default function MyPage() {
   ) => {
     const prevValue = emailConsent;
     setEmailConsent(checked);
-  
+
     if (user && user.id) {
       if (event.target.name === "emailConsent") {
         try {
@@ -96,6 +97,19 @@ export default function MyPage() {
 
   const handleUpdatePasswordButton = () => {
     setFormModalOpen(true);
+  }
+
+  const withdrawUserButtonHanlder = () => {
+    setWithdrawUserModalOpen(true);
+  }
+
+  const withdrawUser =() =>{
+    try{
+      setWithdrawUserModalOpen(false);
+
+    }catch(error){
+
+    }
   }
 
   return (
@@ -179,14 +193,14 @@ export default function MyPage() {
               control={control}
               defaultValue={user?.phone || ""}
               render={({ field }) => (
-                <TextField 
-                {...field}
-                required 
-                sx={{ minWidth: 500, maxWidth: 1000, width: '30%' }}
-                onChange={(e) => {
-                  const digitsOnly = e.target.value.replace(/\D/g, '');
-                  field.onChange(digitsOnly);
-              }}
+                <TextField
+                  {...field}
+                  required
+                  sx={{ minWidth: 500, maxWidth: 1000, width: '30%' }}
+                  onChange={(e) => {
+                    const digitsOnly = e.target.value.replace(/\D/g, '');
+                    field.onChange(digitsOnly);
+                  }}
                 />
               )}
             />
@@ -225,9 +239,9 @@ export default function MyPage() {
               <Typography variant="body1">이메일</Typography>
             </Box>
             <Switch
-            checked = {emailConsent} 
-            name='emailConsent'
-            onChange={handleConsentChange}></Switch>
+              checked={emailConsent}
+              name='emailConsent'
+              onChange={handleConsentChange}></Switch>
           </Box>
 
           <Divider />
@@ -238,29 +252,36 @@ export default function MyPage() {
               <Typography variant="body1">전화번호</Typography>
             </Box>
             <Switch
-            name='phoneConsent'
-            disabled></Switch>
+              name='phoneConsent'
+              disabled></Switch>
           </Box>
         </Box>
       </Container>
-        <Button variant="text" sx={{ color: 'gray', textTransform: 'none', display: 'flex', alignItems: 'center', mt: 2, gap: 1}}>
+      <Button variant="text" sx={{ color: 'gray', textTransform: 'none', display: 'flex', alignItems: 'center', mt: 2, gap: 1 }} onClick={withdrawUserButtonHanlder}>
         <ArrowBackIosNewIcon fontSize="small" sx={{ color: 'gray' }} />
-          회원 탈퇴
-        </Button>
-        <AlertModal 
-          open={alertModalOpen}
-          buttonCount={1}
-          onClose={() => {setAlertModalOpen(false)}}
-          content='정보를 성공적으로 수정했습니다.'
-          />
-          <Modal open={formModalOpen} handleClose={() => {setFormModalOpen(false)}}
-            title={
-              {title : '비밀번호 변경하기', subTitle : ''}
-              }>
-              <ModalContent
-              handleClose={() => {setFormModalOpen(false)}}
-              />
-          </Modal>
+        회원 탈퇴
+      </Button>
+      <AlertModal
+        open={alertModalOpen}
+        buttonCount={1}
+        onClose={() => { setAlertModalOpen(false) }}
+        content='정보를 성공적으로 수정했습니다.'
+      />
+      <AlertModal
+        open={withdrawUserModalOpen}
+        buttonCount={2}
+        onClose={() => {setWithdrawUserModalOpen(false)}}
+        onConfirm={withdrawUser}
+        content={"탈퇴하면 회원과 관련된 모든 정보가 삭제됩니다. \n 정말 삭제하시겠습니까?"}
+      />
+      <Modal open={formModalOpen} handleClose={() => { setFormModalOpen(false) }}
+        title={
+          { title: '비밀번호 변경하기', subTitle: '' }
+        }>
+        <ModalContent
+          handleClose={() => { setFormModalOpen(false) }}
+        />
+      </Modal>
     </Box>
   );
 }

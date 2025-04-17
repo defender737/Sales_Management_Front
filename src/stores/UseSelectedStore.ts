@@ -3,7 +3,7 @@ import {persist, createJSONStorage} from 'zustand/middleware'
 
 type StoreState = {
     selectedStoreId : number | null;
-    setSelectedStoreId : (id : number) => void;
+    setSelectedStoreId : (id : number | null) => void;
 }
 
 export const useSelectedStore = create<StoreState>()(

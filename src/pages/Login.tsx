@@ -28,8 +28,8 @@ export default function Login() {
             navigate('/sales-expenses'); 
         }catch (error) {
             if(axios.isAxiosError(error)){
-                let message = error.response?.data.details;
-                alert(message);
+                //let message = error.response?.data.details;
+                alert("이메일과 비밀번호를 다시 확인해주세요");
             }
         }
     }
@@ -48,7 +48,7 @@ export default function Login() {
                     p: 4,
                 }}
             >
-                <Typography variant="h2" fontWeight={600}>
+                <Typography variant="h1" fontWeight={600}>
                     Tally
                 </Typography>
                 <Typography variant="subtitle1" sx={{ mt: 2 }}>
