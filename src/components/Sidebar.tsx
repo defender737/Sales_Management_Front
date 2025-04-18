@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { styled, useTheme, Theme, CSSObject } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -20,7 +19,7 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Header from './Header';
 import { Typography } from '@mui/material';
-import { useSidebarStatus } from '../stores/UseSidebarStatusStore'
+import { useSidebarStatus } from '../stores/useSidebarStatusStore'
 const drawerWidth = 240; // Drawer의 너비를 정의
 
 // Drawer가 열릴 때의 스타일을 정의

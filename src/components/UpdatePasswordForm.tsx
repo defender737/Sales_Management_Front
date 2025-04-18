@@ -1,4 +1,4 @@
-import React from 'react';
+import {useState, useContext} from 'react';
 import {
   Box,
   TextField,
@@ -10,23 +10,29 @@ import CheckIcon from '@mui/icons-material/Check';
 import { useForm, Controller } from 'react-hook-form';
 import { updatePassword } from '../api/api'
 import { SnackbarContext } from '../contexts/SnackbarContext';
+import { useApiRequest } from '../hooks/useApiRequest';
 import axios from 'axios';
 
-interface UpdatePasswordForm {
+interface UpdatePassword {
   handleClose : () => void
 }
-// 서버에 요청할 폼 구성
-const UpdatePasswordForm = ({ handleClose }: UpdatePasswordForm) => {
+
+export default function UpdatePasswordForm ({ handleClose }: UpdatePassword){
 
   const {control, handleSubmit, getValues, setError} = useForm();
-  const [updateLoading, setUpdateLoading] = React.useState(false);
-  const [updateSuccess, setUpdateSuccess] = React.useState(false);
-  const showSnackbar = React.useContext(SnackbarContext)
-  const minDelay = 500;
+  const showSnackbar = useContext(SnackbarContext);
+  const {request : changePasswordRequest, loading, success} = useApiRequest(
+    (currentPassword : string, newPassword : string) => updatePassword({currentPassword, newPassword}),
+    () => {
+      showSnackbar("비밀번호를 변경하였습니다.", "success");
+      setTimeout(() => handleClose(), 1500);
+    },
+    (msg) => showSnackbar(msg, "error"),
+    {delay : true}
+  )
 
-  const onSubmit = async() => {
+  const onSubmit = () => {
     const {currentPassword,newPassword, newPasswordConfirm} = getValues();
-
     if(newPassword !== newPasswordConfirm){
       setError("newPasswordConfirm", {
         type : "manual",
@@ -34,7 +40,6 @@ const UpdatePasswordForm = ({ handleClose }: UpdatePasswordForm) => {
       });
       return;
     }
-
     if(currentPassword === newPassword){
       setError("newPassword", {
         type : "manual",
@@ -42,31 +47,7 @@ const UpdatePasswordForm = ({ handleClose }: UpdatePasswordForm) => {
       })
       return;
     }
-
-    const startTime = Date.now();
-    setUpdateLoading(true);
-
-    try{
-      const response = await updatePassword({currentPassword, newPassword});
-      console.log("비밀번호 수정 성공");
-
-      const elapsed = Date.now() - startTime;
-      const delay = Math.max(0, minDelay - elapsed);
-
-      setTimeout(() => {
-        setUpdateLoading(false);
-        setUpdateSuccess(true);
-        showSnackbar("비밀번호를 변경하였습니다.", "success");
-        setTimeout(() => handleClose(), 1500);
-      }, delay)
-    }catch (error){
-      if(axios.isAxiosError(error)){
-        const message = error.response?.data.details || "비밀번호 변경에 실패했습니다"
-        showSnackbar(message, "error");
-        setUpdateLoading(false);
-        setUpdateSuccess(false);
-      }
-    }
+    changePasswordRequest(currentPassword, newPassword);
   }
 
   return (
@@ -129,12 +110,10 @@ const UpdatePasswordForm = ({ handleClose }: UpdatePasswordForm) => {
         />
       </Box>
       <Box sx={{ alignSelf: 'flex-end', mt: 2 }}>
-        <Button type="submit" disabled={updateLoading} variant="contained" color="primary" sx={{ minHeight: 40, minWidth: 100 }}>
-          {updateLoading ? <CircularProgress size={20} color="inherit" /> : updateSuccess ? <CheckIcon /> : "확인"}
+        <Button type="submit" disabled={loading} variant="contained" color="primary" sx={{ minHeight: 40, minWidth: 100 }}>
+          {loading ? <CircularProgress size={20} color="inherit" /> : success ? <CheckIcon /> : "확인"}
         </Button>
       </Box>
     </Box>
   );
 };
-
-export default UpdatePasswordForm;

@@ -10,17 +10,19 @@ import SignupForm from "./pages/SignupForm";
 import { SnackbarProvider } from './components/SnackbarProvier';
 import PublicOnlyRoute from './components/routingComponents/PublicOnlyRoute';
 import RedirectRoute from './components/routingComponents/RedirectRoute';
-import {UseAuthInitializer} from './hooks/UseAuthInitializer'
+import {useAuthInitializer} from './hooks/useAuthInitializer'
+import GlobalModals from './components/GlobalModals' 
 
 
 export default function App() {
-  UseAuthInitializer();
+  useAuthInitializer();
 
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <Router>
             <SnackbarProvider>
+            <GlobalModals />
               <Routes>
                 <Route path="/" element={<RedirectRoute />} />
 

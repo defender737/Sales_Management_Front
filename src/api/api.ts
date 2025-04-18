@@ -1,7 +1,7 @@
 // src/api/api.ts
 import axios from 'axios';
-import { registerForm, storeForm } from '../types/types'
-import { setAccessToken, getAccessToken } from '../stores/UseAuthStore'
+import { registerForm, storeForm, getSalesRecordList } from '../types/types'
+import { setAccessToken, getAccessToken } from '../stores/useAuthStore'
 
 const api = axios.create({
   baseURL: 'http://localhost:8080/api/',  // 기본 URL 설정
@@ -92,28 +92,7 @@ api.interceptors.request.use(
 );
 
 // 매장별 매출 내역 조회
-export const getSalesRecordsList = (
-  storeId: number,
-  page: number,
-  size: number,
-  order: string,
-  type: string,
-  startDate?: string,
-  endDate?: string
-) => {
-  const params: any = {
-    storeId,
-    page,
-    size,
-    sortOrder: order,
-    type
-  };
-
-  if (startDate && endDate) {
-    params.startDate = startDate;
-    params.endDate = endDate;
-  }
-
+export const getSalesRecordsList = (params : getSalesRecordList) => {
   return api.get('records', { params });
 };
 
@@ -133,7 +112,7 @@ export const createSalesRecord = (storeId : number, record: {
   return api.post(`records?storeId=${storeId}`, record);
 };
 
-export const editSalesRecord = (id: number, record: {
+export const updateSalesRecord = (id: number, record: {
   date: string;
   type: string;
   amount: number;

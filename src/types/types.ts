@@ -1,3 +1,13 @@
+export interface getSalesRecordList {
+  storeId: number,
+  page: number,
+  size: number,
+  order: string,
+  type: string,
+  startDate?: string,
+  endDate?: string
+}
+
 export interface SalesRecord {
     no?: number,
     id: number;

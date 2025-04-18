@@ -8,7 +8,7 @@ interface AlertModalProps {
   content: string;
   cancelText?: string;
   confirmText?: string;
-  buttonCount?: 1 | 2;
+  buttonCount?: 0 | 1 | 2;
 }
 
 const AlertModal = ({
@@ -49,7 +49,10 @@ const AlertModal = ({
         {buttonCount === 1 ? (
           <Button
             variant='contained'
-            onClick={onClose}
+            onClick={() => {
+              onConfirm?.();
+              onClose();
+            }}
             sx={{
               width: '100%',
               height: '100%',
@@ -61,7 +64,7 @@ const AlertModal = ({
           >
             {confirmText}
           </Button>
-        ) : (
+        ) : buttonCount === 2 && (
           <>
             <Button
               onClick={onClose}
@@ -79,7 +82,10 @@ const AlertModal = ({
             </Button>
             <Button
               variant='contained'
-              onClick={onConfirm}
+              onClick={() => {
+                onConfirm?.();
+                onClose();
+              }}
               sx={{
                 width: '50%',
                 height: '100%',

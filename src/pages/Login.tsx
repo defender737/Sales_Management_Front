@@ -1,10 +1,12 @@
-import { Box, Typography, TextField, Button, Checkbox, FormControlLabel, Link, Paper, Divider } from '@mui/material';
+import { Box, Typography, TextField, Button, Checkbox, FormControlLabel, Link, Paper, Divider, CircularProgress } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useForm } from 'react-hook-form';
 import { login, initUserData } from '../api/api'
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuthStore } from '../stores/UseAuthStore';
+import { useAuthStore } from '../stores/useAuthStore';
+import { useApiRequest } from '../hooks/useApiRequest';
+import { useFetchCurrentUser } from '../hooks/useFetchCurrentUser';
 
 interface LoginForm {
     email: string;
@@ -13,29 +15,29 @@ interface LoginForm {
 
 export default function Login() {
 
-    const {setUser, setAccessToken} = useAuthStore();
+    const { setUser, setAccessToken } = useAuthStore();
+    const {fetchCurrentUser} = useFetchCurrentUser();
 
     const { register, handleSubmit } = useForm<LoginForm>();
     const navigate = useNavigate();
 
-    const loginSubmit = async (data: LoginForm) => {
-        try{
-            const response = await login(data);
-            const accessToken = response.data.accessToken;
-            setAccessToken(accessToken);
-            const userData = await initUserData();
-            setUser(userData.data);
-            navigate('/sales-expenses'); 
-        }catch (error) {
-            if(axios.isAxiosError(error)){
-                //let message = error.response?.data.details;
-                alert("이메일과 비밀번호를 다시 확인해주세요");
-            }
-        }
+    const { request: loginRequest, loading: loginLoading } =
+        useApiRequest(
+            (data: LoginForm) => login(data),
+            async (response) => {
+                const accessToken = response.data.accessToken;
+                setAccessToken(accessToken);
+                fetchCurrentUser();
+                navigate('/sales-expenses');
+            },
+            (msg) => alert(msg),
+            {delay : true}
+        )
+    const loginSubmit = (data: LoginForm) => {
+        loginRequest(data);
     }
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', backgroundImage : 'url(/assets/img/backImage.jpg)' }}>
-            {/* Welcome section */}
+        <Box sx={{ display: 'flex', minHeight: '100vh', backgroundImage: 'url(/assets/img/backImage.jpg)' }}>
             <Box
                 sx={{
                     flex: 3,
@@ -56,26 +58,27 @@ export default function Login() {
                 </Typography>
 
             </Box>
-
-            {/* Login form */}
             <Box sx={{ flex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 4, bgcolor: 'rgba(255, 255, 255, 0.92)' }}>
                 <Paper elevation={3} sx={{ p: 4, width: '100%', maxWidth: 500, borderRadius: 4 }}>
-                    <Box sx={{display : 'flex', alignItems : 'center', justifyContent : 'center'}}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Typography variant="h4" sx={{ color: "primary.main", fontWeight: 'bold' }}>
                             로그인
                         </Typography>
                     </Box>
                     <form onSubmit={handleSubmit(loginSubmit)}>
                         <TextField {...register("email")} fullWidth margin="normal" label="이메일" variant="standard" />
-                        <TextField {...register("password")}fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
+                        <TextField {...register("password")} fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
                         <FormControlLabel control={<Checkbox defaultChecked />} label="로그인 유지하기" />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
                             <Link href="#" variant="body2" underline='none'>
                                 비밀번호 찾기
                             </Link>
                         </Box>
-                        <Button type='submit' variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize : 18 }}>
-                            로그인
+                        <Button type='submit' variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: 18 }}>
+                            {loginLoading ? (
+                                <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                            ) : "로그인"
+                            }
                         </Button>
                     </form>
                     <Divider sx={{ my: 3 }} textAlign="center">
@@ -83,7 +86,7 @@ export default function Login() {
                             소셜 계정으로 간편 로그인
                         </Typography>
                     </Divider>
-                    <Box sx={{ display: 'flex', gap: 9, alignItems: 'center', justifyContent: 'center', mt: 2, mb : 2}}>
+                    <Box sx={{ display: 'flex', gap: 9, alignItems: 'center', justifyContent: 'center', mt: 2, mb: 2 }}>
                         <Button
                             sx={{
                                 p: 0,
@@ -128,7 +131,7 @@ export default function Login() {
                         </Button>
                     </Box>
                     <Divider />
-                    <Box sx={{ display : 'flex' , textAlign: 'center', justifyContent : 'center', mt: 3, gap : 2}}>
+                    <Box sx={{ display: 'flex', textAlign: 'center', justifyContent: 'center', mt: 3, gap: 2 }}>
                         <Typography variant="subtitle1">
                             아직 계정이 없다면?
                         </Typography>

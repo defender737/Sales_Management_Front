@@ -24,7 +24,7 @@ interface modalProps {
     open : boolean,
     handleClose : () => void
     children : React.ReactNode,
-    title : {title : string, subTitle : string}
+    title : {title : string, subTitle?: string}
 }
 
 export default function BasicModal({open, handleClose, children, title} : modalProps) {

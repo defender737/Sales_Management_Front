@@ -2,10 +2,10 @@
 
 import { useEffect } from 'react';
 import axios from 'axios';
-import { useAuthStore } from '../stores/UseAuthStore';
+import { useAuthStore } from '../stores/useAuthStore';
 import { reissueAccessToken, initUserData } from '../api/api';
 
-export function UseAuthInitializer() {
+export function useAuthInitializer() {
   const { setIsLoading, setAccessToken, setUser } = useAuthStore();
 
   useEffect(() => {

@@ -7,23 +7,24 @@ import {
   FormControl,
   Avatar,
   Divider,
-  Switch
+  Switch,
+  CircularProgress
 } from '@mui/material';
 import { useState, useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import PageTitle from '../components/PageTitle'
-import { updateUser, initUserData, updateEmailConsent } from '../api/api'
-import axios from 'axios';
+import { updateUser, updateEmailConsent, withdraw } from '../api/api'
 import { SnackbarContext } from '../contexts/SnackbarContext'
-import { useAuthStore } from '../stores/UseAuthStore'
+import { useAuthStore } from '../stores/useAuthStore'
 import SmartPhoneIcon from "@mui/icons-material/Smartphone"
 import EmailIcon from "@mui/icons-material/MailOutline"
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-
-import AlertModal from '../components/AlertModal';
-import Modal from "../components/Modal"
-import ModalContent from "../components/UpdatePasswordForm"
-
+import { useAlertModal } from '../stores/useAlertModal';
+import UpdatePasswordForm from '../components/UpdatePasswordForm';
+import { useFormModal } from '../stores/useFormModal';
+import { useApiRequest } from '../hooks/useApiRequest';
+import { useFetchCurrentUser } from '../hooks/useFetchCurrentUser'
+import { useSelectedStore } from '../stores/useSelectedStore';
 
 const pageTitle = {
   title: '마이페이지',
@@ -43,28 +44,58 @@ export default function MyPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const showSnackbar = useContext(SnackbarContext);
   const { user, setUser } = useAuthStore();
+  const { setAccessToken } = useAuthStore();
+  const { setSelectedStoreId } = useSelectedStore();
   const [emailConsent, setEmailConsent] = useState(user?.isEmailConsent ?? false);
-  const [alertModalOpen, setAlertModalOpen] = useState(false);
-  const [formModalOpen, setFormModalOpen] = useState(false)
-  const [withdrawUserModalOpen, setWithdrawUserModalOpen] = useState(false);
+  const { open: openAlert } = useAlertModal();
+  const { open: openForm, close: closeForm } = useFormModal();
+  const { fetchCurrentUser } = useFetchCurrentUser();
+  const { request: updateRequest, loading: updateLoading } = useApiRequest(
+    (data) => updateUser(data, imageFile),
+    () => {
+      openAlert({
+        content: '정보 수정이 완료되었습니다.',
+        buttonCount: 1,
+      });
+      showSnackbar("사용자 정보를 수정했습니다.", "success");
+      fetchCurrentUser();
+    },
+    (msg) => showSnackbar(msg, "error")
+    ,{delay : true}
+  )
 
-  const onSubmit = async (data: any) => {
-    console.log('유저 수정 :', data);
+  const { request: emailConsentUpdateRequest } = useApiRequest(
+    (checked: boolean) => updateEmailConsent(checked),
+    (response) => {
+      console.log(response)
+      // showSnackbar(response.data, "success");
+      showSnackbar(response.data.isEmailConsent ?
+        "이메일 프로모션 정보 수신을 동의하셨습니다." : "이메일 프로모션 정보 수신 동의를 해제하였습니다.", "success");
+    },
+    (msg) => {
+      showSnackbar(msg, "error")
+      setEmailConsent(!emailConsent);
+    }
+  )
+
+  const { request: withdrawRequest } = useApiRequest(
+    () => withdraw(),
+    () => {
+      openAlert({
+        content: '탈퇴가 완료되었습니다.',
+        buttonCount: 1,
+      });
+      setUser(null);
+      setAccessToken(null);
+      setSelectedStoreId(null);
+    },
+    (msg) => showSnackbar(msg, "error"),
+    { delay: true }
+  )
+
+  const onSubmit = (data: any) => {
     if (user && user.id) {
-      try {
-        const response = await updateUser(data, imageFile);
-        console.log(response)
-        setAlertModalOpen(true);
-        showSnackbar("사용자 정보를 수정했습니다.", "success");
-        const updatedUser = await initUserData();
-        setUser(updatedUser.data);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          let message = (error.response?.data.details && error.response?.data.details !== undefined)
-            ? error.response?.data.details : "사용자 정보 수정에 실패했습니다.";
-          showSnackbar(message, "error");
-        }
-      }
+      updateRequest(data);
     }
   };
 
@@ -72,44 +103,25 @@ export default function MyPage() {
     event: React.ChangeEvent<HTMLInputElement>,
     checked: boolean
   ) => {
-    const prevValue = emailConsent;
-    setEmailConsent(checked);
-
     if (user && user.id) {
-      if (event.target.name === "emailConsent") {
-        try {
-          await updateEmailConsent(checked);
-          const message = checked
-            ? "프로모션 이메일 수신에 동의하셨습니다."
-            : "프로모션 이메일 수신 동의를 해제하였습니다";
-          showSnackbar(message, "success");
-        } catch (error) {
-          setEmailConsent(prevValue);
-          if (axios.isAxiosError(error)) {
-            const message =
-              error.response?.data.details ?? "프로모션 이메일 수신 동의 상태 변경에 실패했습니다";
-            showSnackbar(message, "error");
-          }
-        }
-      }
+      setEmailConsent(checked);
+      emailConsentUpdateRequest(checked)
     }
   };
 
   const handleUpdatePasswordButton = () => {
-    setFormModalOpen(true);
+    openForm({
+      title: '비밀번호 변경하기',
+      formComponent: <UpdatePasswordForm handleClose={() => closeForm()} />
+    })
   }
 
   const withdrawUserButtonHanlder = () => {
-    setWithdrawUserModalOpen(true);
-  }
-
-  const withdrawUser =() =>{
-    try{
-      setWithdrawUserModalOpen(false);
-
-    }catch(error){
-
-    }
+    openAlert({
+      content: '탈퇴하면 회원과 관련된 모든 정보가 삭제됩니다. \n 정말 탈퇴하시겠습니까?',
+      buttonCount: 2,
+      onConfirm: () => { withdrawRequest() }
+    });
   }
 
   return (
@@ -176,7 +188,7 @@ export default function MyPage() {
             <Controller
               name="name"
               control={control}
-              defaultValue={user?.name || ""}
+              defaultValue={user?.name ?? ""}
               rules={{ required: true }}
               render={({ field }) => (
                 <FormControl>
@@ -208,8 +220,11 @@ export default function MyPage() {
               <Button onClick={handleUpdatePasswordButton} variant="contained" color="primary" size='large' sx={{ width: 150 }}>
                 비밀번호 변경
               </Button>
-              <Button type="submit" variant="contained" color="primary" size='large' sx={{ width: 150 }}>
-                내 정보 수정
+              <Button type="submit" disabled={updateLoading} variant="contained" color="primary" size='large' sx={{ width: 150 }}>
+                {updateLoading ? (
+                  <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                ) : "내 정보 수정"
+                }
               </Button>
             </Box>
           </Box>
@@ -261,27 +276,6 @@ export default function MyPage() {
         <ArrowBackIosNewIcon fontSize="small" sx={{ color: 'gray' }} />
         회원 탈퇴
       </Button>
-      <AlertModal
-        open={alertModalOpen}
-        buttonCount={1}
-        onClose={() => { setAlertModalOpen(false) }}
-        content='정보를 성공적으로 수정했습니다.'
-      />
-      <AlertModal
-        open={withdrawUserModalOpen}
-        buttonCount={2}
-        onClose={() => {setWithdrawUserModalOpen(false)}}
-        onConfirm={withdrawUser}
-        content={"탈퇴하면 회원과 관련된 모든 정보가 삭제됩니다. \n 정말 삭제하시겠습니까?"}
-      />
-      <Modal open={formModalOpen} handleClose={() => { setFormModalOpen(false) }}
-        title={
-          { title: '비밀번호 변경하기', subTitle: '' }
-        }>
-        <ModalContent
-          handleClose={() => { setFormModalOpen(false) }}
-        />
-      </Modal>
     </Box>
   );
 }

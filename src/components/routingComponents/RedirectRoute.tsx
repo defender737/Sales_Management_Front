@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/UseAuthStore'
+import { useAuthStore } from '../../stores/useAuthStore'
 
 const RedirectRoute = () => {
   const {accessToken} = useAuthStore();

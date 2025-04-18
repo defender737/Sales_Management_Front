@@ -13,15 +13,16 @@ import { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import PageTitle from '../components/PageTitle'
 import DaumPostcode from 'react-daum-postcode';
-import Modal from '../components/Modal'
-import { createStore, initUserData, updateStore, deleteStore } from '../api/api'
-import axios from 'axios';
+import { createStore, updateStore, deleteStore } from '../api/api'
 import { SnackbarContext } from '../contexts/SnackbarContext'
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from '../stores/UseAuthStore'
-import AlertModal from '../components/AlertModal';
+import { useAuthStore } from '../stores/useAuthStore'
 import { useParams } from 'react-router-dom'
 import StoreIcon from '@mui/icons-material/Store';
+import { useApiRequest } from '../hooks/useApiRequest';
+import { useFetchCurrentUser } from '../hooks/useFetchCurrentUser'
+import { useAlertModal } from '../stores/useAlertModal'
+import { useFormModal } from '../stores/useFormModal'
 
 
 const pageTitleForCreate = {
@@ -44,17 +45,16 @@ const categories = [
 
 export default function AddStoreForm() {
   const { handleSubmit, control, setValue, reset } = useForm();
-  const [openPostcode, setOpenPostcode] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [openResultModal, setOpenResultModal] = useState(false);
-  const [openDeleteCautionModal, setOpenDeleteCautionModal] = useState(false);
   const showSnackbar = useContext(SnackbarContext);
+  const { fetchCurrentUser } = useFetchCurrentUser();
   const navigate = useNavigate();
-  const { user, setUser } = useAuthStore();
-
+  const { user } = useAuthStore();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
+  const { open: openForm, close: closeForm } = useFormModal();
+  const { open: openAlert } = useAlertModal();
 
   useEffect(() => {
     reset({
@@ -83,42 +83,54 @@ export default function AddStoreForm() {
     }
   }, [id])
 
-  const handlePostCodeButtonClick = () => {
-    setOpenPostcode(true);
-  }
-  const handlePostCodeClose = () => {
-    setOpenPostcode(false);
-  }
-  const resultModalCloseforCreate = () => {
-    setOpenResultModal(false);
-    navigate('/');
-  };
-  const resultModalCloseforEdit = () => {
-    setOpenResultModal(false);
-  }
-  const deleteCautionModalonConfirm = async () => {
-    try {
-      const response = await deleteStore(Number(id));
-      console.log(response)
+  const { request: createOrUpdateRequest } = useApiRequest(
+    (data) => isEdit ? updateStore(Number(id), data, imageFile) : createStore(data, imageFile),
+    () => {
+      const message = isEdit ? "매장 정보를 수정했습니다" : "새로운 매장이 등록되었습니다"
+      showSnackbar(message, "success");
+      fetchCurrentUser();
+      openAlert({
+        content: isEdit ? "매장 정보를 수정했습니다." : "매장을 추가했습니다.",
+        buttonCount: 1,
+        onConfirm: () => { !isEdit && navigate('/') }
+      })
+    },
+    (msg) => showSnackbar(msg, "error"),
+  )
+
+  const { request: deleteRequest } = useApiRequest(
+    () => deleteStore(Number(id)),
+    () => {
       const message = "매장을 삭제했습니다."
       showSnackbar(message, "success");
-
-      const updatedUser = await initUserData();
-      setUser(updatedUser.data);
-
+      fetchCurrentUser();
       //TODO : 뒤로가기
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        let message = (error.response?.data.details && error.response?.data.details !== undefined) ? error.response?.data.details : error.response?.data.message;
-        alert(message)
-        showSnackbar(message, "error");
-      }
-    }finally{
-      setOpenDeleteCautionModal(false);
-    }
+    },
+    (msg) => showSnackbar(msg, "error"),
+  )
+
+  const onSubmit = (data: any) => {
+    createOrUpdateRequest(data);
+  };
+
+  const handlePostCodeButtonClick = () => {
+    openForm({
+      title: '주소 검색',
+      formComponent: (
+        <DaumPostcode onComplete={selectAddress} autoClose={false} style={{
+          width: '1000px',
+          height: '600px'
+        }} />
+      )
+    });
   }
-  const deleteCautionModalonClose= () => {
-    setOpenDeleteCautionModal(false);
+
+  const handleDeleteButton = () => {
+    openAlert({
+      content: "매장을 삭제하면 매장과 관련된 모든 정보가 삭제됩니다. \n 정말 삭제하시겠습니까?",
+      buttonCount: 2,
+      onConfirm: () => deleteRequest(),
+    })
   }
 
   const selectAddress = (data: any) => {
@@ -128,35 +140,7 @@ export default function AddStoreForm() {
       : roadAddress;
     setValue('roadAddress', fullAddress);
     setValue('zipCode', zonecode);
-    handlePostCodeClose();
-  }
-
-
-  const onSubmit = async (data: any) => {
-
-    console.log('매장 등록:', data);
-    try {
-      const response = isEdit ? await updateStore(Number(id), data, imageFile) : await createStore(data, imageFile);
-      console.log(response)
-      const message = isEdit ? "매장 정보를 수정했습니다" : "새로운 매장이 등록되었습니다"
-      showSnackbar(message, "success");
-
-      const updatedUser = await initUserData();
-      setUser(updatedUser.data);
-
-      setOpenResultModal(true);
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        let message = (error.response?.data.details && error.response?.data.details !== undefined) ? error.response?.data.details : error.response?.data.message;
-        alert(message)
-        showSnackbar(message, "error");
-
-      }
-    }
-  };
-
-  const handleDeleteButton = () => {
-    setOpenDeleteCautionModal(true);
+    closeForm();
   }
 
   return (
@@ -182,7 +166,7 @@ export default function AddStoreForm() {
             alt='매장 이미지 미리보기'
             sx={{ width: 250, height: 250 }}
           >
-            <StoreIcon sx={{fontSize : 150}}/>
+            <StoreIcon sx={{ fontSize: 150 }} />
           </Avatar>
           <input
             accept="image/*"
@@ -286,26 +270,6 @@ export default function AddStoreForm() {
           </Box>
         </Box>
       </Container>
-      <Modal open={openPostcode} handleClose={handlePostCodeClose}
-        title={{ title: '주소 검색', subTitle: '' }}>
-        <DaumPostcode onComplete={selectAddress} autoClose={false} style={{
-          width: '1000px',
-          height: '600px'
-        }} />
-      </Modal>
-      <AlertModal
-        open={openResultModal}
-        buttonCount={1}
-        onClose={isEdit ? resultModalCloseforEdit : resultModalCloseforCreate}
-        content={isEdit ? "매장 정보를 수정했습니다." : "매장을 추가했습니다."}
-      />
-      <AlertModal
-        open={openDeleteCautionModal}
-        buttonCount={2}
-        onClose={deleteCautionModalonClose}
-        onConfirm={deleteCautionModalonConfirm}
-        content={"매장을 삭제하면 매장과 관련된 모든 정보가 삭제됩니다. \n 정말 삭제하시겠습니까?"}
-      />
     </Box>
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
@@ -9,11 +9,11 @@ import PersonIcon from '@mui/icons-material/Person';
 import StoreIcon from '@mui/icons-material/Store';
 import { FormControl, Select, MenuItem, Box, Toolbar, Typography, Avatar, Tooltip, Menu, Divider, ListItemText } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuthStore } from '../stores/UseAuthStore';
+import { useAuthStore } from '../stores/useAuthStore';
 import AddStoreButton from '@mui/icons-material/AddBusiness'
-import {useSelectedStore} from '../stores/UseSelectedStore'
-import { SnackbarContext } from '../contexts/SnackbarContext';
-import {logout} from '../api/api'
+import { useSelectedStore } from '../stores/useSelectedStore'
+import { logout } from '../api/api'
+import { useApiRequest } from '../hooks/useApiRequest'
 
 const drawerWidth = 240;
 
@@ -45,12 +45,19 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 
-const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
+export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { selectedStoreId, setSelectedStoreId } = useSelectedStore();
   const { user, setUser, setAccessToken } = useAuthStore();
-  const showSnackbar = useContext(SnackbarContext);
-  const navigate = useNavigate();
+  const { request: logouRequest } = useApiRequest(
+    () => logout(),
+    () => {
+      setUser(null);
+      setAccessToken(null);
+      setSelectedStoreId(null);
+    },
+    (msg) => alert(msg)
+  )
 
   useEffect(() => {
     if (user?.storeList?.length) {
@@ -68,21 +75,6 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
     setAnchorEl(null);
   };
   const openMenu = Boolean(anchorEl);
-
-  const logoutHandler = async () => {
-    try{
-      const respone = await logout();
-      console.log(respone.data)
-      setUser(null);
-      setAccessToken(null);
-      setSelectedStoreId(null);
-    }catch (error){
-      if (axios.isAxiosError(error)) {
-        let message = "로그아웃 실패";
-        showSnackbar(message, "error");
-      }
-    }
-  }
 
   return (
     <AppBar position="fixed" open={open}
@@ -107,19 +99,19 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
         </IconButton>
         <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography
-            component={Link}
-            to="/"
-            variant="h6"
-            noWrap
-            sx={{
-              textDecoration: 'none',
-              color: 'inherit',
-            }}
-          >
-            Tally
-          </Typography>
-            <FormControl sx={{ minWidth: 300, ml: 4}} size="small">
+            <Typography
+              component={Link}
+              to="/"
+              variant="h6"
+              noWrap
+              sx={{
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              Tally
+            </Typography>
+            <FormControl sx={{ minWidth: 300, ml: 4 }} size="small">
               <Select
                 id="storeSelect"
                 displayEmpty
@@ -129,13 +121,13 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                   const store = user?.storeList.find((s) => s.id === selected);
                   return (
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      {store 
-                      ?                       
-                      <Avatar src={store?.fileUrl ? `http://localhost:8080/api${store.fileUrl}` : undefined} sx={{width: 30, height: 30,}}>
-                        <StoreIcon fontSize="small" />
-                      </Avatar>
-                      :
-                      <></>
+                      {store
+                        ?
+                        <Avatar src={store?.fileUrl ? `http://localhost:8080/api${store.fileUrl}` : undefined} sx={{ width: 30, height: 30, }}>
+                          <StoreIcon fontSize="small" />
+                        </Avatar>
+                        :
+                        <></>
                       }
                       <Typography sx={{ ml: 1 }}>{store?.storeName ?? (user?.storeList?.length === 0 ? '매장을 추가해주세요' : '매장을 선택해주세요')}</Typography>
                     </Box>
@@ -143,41 +135,41 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                 }}
               >
                 {user && Array.isArray(user.storeList) && user.storeList.length > 0
-                ?
+                  ?
                   user?.storeList.map((store) => (
                     <MenuItem key={store.id} value={store.id}>
-                      <Box sx={{display : 'flex', alignItems : 'center'}}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Avatar src={`http://localhost:8080/api${store?.fileUrl}`} sx={{ width: 30, height: 30 }}>
-                          <StoreIcon fontSize='small'/>
+                          <StoreIcon fontSize='small' />
                         </Avatar>
                       </Box>
-                      <ListItemText sx={{ml : 1}}>{store.storeName}</ListItemText>
+                      <ListItemText sx={{ ml: 1 }}>{store.storeName}</ListItemText>
                     </MenuItem>
                   ))
                   :
                   <MenuItem key={"noStore"} value={-1}>
-                  <ListItemText sx={{ml : 1}}>매장을 추가해주세요</ListItemText>
-                </MenuItem>
+                    <ListItemText sx={{ ml: 1 }}>매장을 추가해주세요</ListItemText>
+                  </MenuItem>
                 }
               </Select>
             </FormControl>
-              <Tooltip title="가게 추가" arrow >
-                <IconButton
-                  component = {Link}
-                  to = {'/myStore/create'}
-                  size="large"
-                  edge="end"
-                  color="primary"
-                  aria-label="addStore"
-                  sx={{ ml: 1 }}
-                >
-                  <AddStoreButton />
-                </IconButton>
-                </Tooltip>
+            <Tooltip title="가게 추가" arrow >
+              <IconButton
+                component={Link}
+                to={'/myStore/create'}
+                size="large"
+                edge="end"
+                color="primary"
+                aria-label="addStore"
+                sx={{ ml: 1 }}
+              >
+                <AddStoreButton />
+              </IconButton>
+            </Tooltip>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box onClick={handleAvatarClick} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mr: 3 }} >
-              <Avatar 
+              <Avatar
                 src={user?.fileUrl ? `http://localhost:8080/api${user.fileUrl}` : undefined}
                 sx={{ bgcolor: "orange" }}>
                 {user?.name?.charAt(0) ?? 'U'}
@@ -192,25 +184,25 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
               </Box>
             </Box>
             <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}
-            sx={{ mt: 1}}
-            slotProps={{ paper: { sx : {width: 230, maxWidth: '100%' }}}}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
+              sx={{ mt: 1 }}
+              slotProps={{ paper: { sx: { width: 230, maxWidth: '100%' } } }}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
             >
               <MenuItem component={Link} to={'/mypage'} onClick={handleMenuClose}>
                 <PersonIcon />
-                <ListItemText sx={{ml : 1}}>마이페이지</ListItemText>
+                <ListItemText sx={{ ml: 1 }}>마이페이지</ListItemText>
               </MenuItem>
               <Divider />
-              <MenuItem component={Link} to={'/myStore'}  onClick={handleMenuClose}>
+              <MenuItem component={Link} to={'/myStore'} onClick={handleMenuClose}>
                 <StoreIcon />
-                <ListItemText sx={{ml : 1}}>마이스토어</ListItemText>
+                <ListItemText sx={{ ml: 1 }}>마이스토어</ListItemText>
               </MenuItem>
             </Menu>
             <Tooltip title="로그아웃" arrow >
@@ -220,7 +212,7 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
                 color="inherit"
                 aria-label="logout"
                 sx={{ ml: 2 }}
-                onClick={logoutHandler}
+                onClick={() => { logouRequest() }}
               >
                 <LogoutIcon />
               </IconButton>
@@ -231,5 +223,3 @@ const Header = ({ open, handleDrawerOpen }: HeaderProps) => {
     </AppBar >
   );
 };
-
-export default Header;

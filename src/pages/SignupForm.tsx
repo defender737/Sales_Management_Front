@@ -3,9 +3,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
 import { requestEmailVerification, requestEmailCodeVerification, register } from '../api/api';
 import { registerWithoutEmailVerified } from '../types/types';
-import axios from 'axios';
-
-
 import {
     Box,
     Paper,
@@ -30,9 +27,9 @@ import {
 } from "@mui/material";
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import AlertModal from '../components/AlertModal'
 import { SnackbarContext } from '../contexts/SnackbarContext';
-
+import { useApiRequest } from '../hooks/useApiRequest';
+import { useAlertModal } from '../stores/useAlertModal';
 
 const emailDomains = ['gmail.com', 'naver.com', 'daum.net', 'kakao.com'];
 
@@ -44,20 +41,64 @@ export default function SignupForm() {
 
     const [email, setEmail] = useState(''); // 이메일 자동 완성, 인증 요청
     const [validOpen, setValidOpen] = useState(false); // 인증 코드 입력창 열기
-    const [emailVarifyButtonLoading, setEmailVarifyButtonLoading] = useState(false); // 이메일 인증 코드 요청 중 로딩
     const [isEmailVerified, setIsEmailVerified] = useState(false); // 이메일 인증 여부
     const [emailRequestDisabled, setEmailRequestDisabled] = useState(false); // 이메일 인증 비활성화(인증 완료 후)
-    const [modalOpen, setModalOpen] = useState(false); // 회원가입 완료 모달 열기
     const [signupComplite, setSignupComplite] = useState(false); // 회원가입 완료 상태(회원 가입 버튼 비활성화)
     const [emailError, setEmailError] = useState<string | null>(null); // 이메일 오류 메시지(중복 등)
     const [emailCodeError, setEmailCodeError] = useState<string | null>(null); // 이메일 인증 코드 오류 메시지(인증 코드 불일치 등)
+    const { open: openAlert } = useAlertModal();
 
-    const handleClose = () => { setModalOpen(false); };
+
+    const { request: registerRequest, loading: registerLoading } =
+        useApiRequest(
+            (data: registerWithoutEmailVerified, isEmailVerified: boolean, email: string) =>
+                register({ ...data, isEmailVerified: isEmailVerified, email: email }),
+            () => {
+                setSignupComplite(true);
+                openAlert({
+                    content: "회원가입을 완료했습니다.",
+                    buttonCount: 1,
+                    confirmText: "로그인 페이지로 돌아가기",
+                    onConfirm: () => { navigate('/login'); }
+                })
+            },
+            (msg) => showSnackbar(msg, "error"),
+            { delay: true }
+        )
+
+    const { request: emailVarifyRequest, loading: emailVarifyLoading } =
+        useApiRequest(
+            (email: string) => requestEmailVerification(email),
+            (response) => {
+                showSnackbar(response.data, "success");
+                setEmailError(null);
+                setValidOpen(true);
+            },
+            (msg) => {
+                setEmailError(typeof msg === "string" ? msg : "이메일 오류 발생");
+                showSnackbar(msg, "error")
+            }
+        )
+
+    const { request: emailCodeVarifyRequest, loading: emailCodeVarifyLoading } =
+        useApiRequest(
+            (email: string, code: string) => requestEmailCodeVerification(email, code),
+            (response) => {
+                showSnackbar(response.data, "success");
+                setIsEmailVerified(true);
+                setValidOpen(false);
+                setEmailRequestDisabled(true);
+            },
+            (msg) => {
+                setEmailCodeError(typeof msg === "string" ? msg : "이메일 코드 오류 발생");
+                showSnackbar(msg, "error")
+            },
+            { delay: true }
+        )
 
     const options = email && !email.includes('@')
         ? emailDomains.map(domain => `${email}@${domain}`)
         : [];
-
     const {
         control,
         handleSubmit,
@@ -67,12 +108,7 @@ export default function SignupForm() {
     } = useForm<registerWithoutEmailVerified>({
     });
 
-    const redirectToLogin = () => {
-        navigate('/login');
-    }
-
-    const onSubmit = async (data: registerWithoutEmailVerified) => {
-
+    const onSubmit = (data: registerWithoutEmailVerified) => {
         if (!isEmailVerified) {
             showSnackbar("이메일 인증을 완료해주세요.", "error");
             return;
@@ -81,60 +117,22 @@ export default function SignupForm() {
             alert("이미 회원가입이 완료되었습니다.");
             return;
         }
-        try {
-            const response = await register({ ...data, isEmailVerified: isEmailVerified, email: email });
-            showSnackbar(response.data, "success");
-            setSignupComplite(true); // 회원가입 완료 상태로 변경
-            setModalOpen(true); // 회원가입 완료 모달 열기
-        } catch (error) {
-            console.error("회원가입 실패:", error);
-            showSnackbar("회원가입에 실패하였습니다. 다시 시도해주세요.", "error");
-        }
+        registerRequest(data, isEmailVerified, email)
     };
 
-    const emailVarifyRequest = async () => {
-        setEmailVarifyButtonLoading(true);
+    const emailVarify = async () => {
         setEmailRequestDisabled(true);
-        try {
-            const response = await requestEmailVerification(email);
-            showSnackbar(response.data, "success");
-            setEmailError(null);
-            setValidOpen(true);
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.log(error)
-                let message = error.response?.data?.details;
-                showSnackbar(message, "error");
-                setEmailError(typeof message === "string" ? message : "이메일 오류 발생");
-            }
-        } finally {
-            setEmailVarifyButtonLoading(false);
-            setEmailRequestDisabled(false);
-        }
+        emailVarifyRequest(email);
+        setEmailRequestDisabled(false);
     }
 
-    const emailVarifyCodeRequest = async () => {
+    const emailCodeVarify = async () => {
         const code = codeRef.current?.value;
         if (!code) {
             showSnackbar("인증코드를 입력해주세요.", "error");
             return;
         }
-        try {
-            const response = await requestEmailCodeVerification(email, code);
-            console.log("인증 요청 결과:", response);
-            showSnackbar(response.data, "success");
-            setIsEmailVerified(true);
-            setValidOpen(false);
-            setEmailRequestDisabled(true);
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                const message = error.response?.data?.details;
-                showSnackbar(message, "error");
-                setEmailCodeError(typeof message === "string" ? message : "이메일 코드 오류 발생");
-            } else {
-                showSnackbar("인증 요청에 실패하였습니다.", "error");
-            }
-        }
+        emailCodeVarifyRequest(email, code)
     }
     return (
         <>
@@ -175,10 +173,10 @@ export default function SignupForm() {
                                         }}
                                     />
                                     <Button variant="contained" color="primary" sx={{ flex: 1 }}
-                                        onClick={emailVarifyRequest}
+                                        onClick={emailVarify}
                                         disabled={emailRequestDisabled}
                                     >
-                                        {emailVarifyButtonLoading ? (
+                                        {emailVarifyLoading ? (
                                             <CircularProgress size={24} sx={{ color: 'inherit' }} />
                                         ) : isEmailVerified ? (
                                             "인증 완료"
@@ -210,7 +208,15 @@ export default function SignupForm() {
                                                 inputRef={codeRef}
                                                 error={!!emailCodeError}
                                             />
-                                            <Button variant="contained" color="primary" sx={{ flex: 1 }} onClick={emailVarifyCodeRequest}>인증 하기</Button>
+                                            <Button variant="contained" color="primary" sx={{ flex: 1 }}
+                                                onClick={emailCodeVarify}
+                                                disabled={emailCodeVarifyLoading}
+                                            >
+                                                {emailCodeVarifyLoading ? (
+                                                    <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                                                ) : "인증 하기"
+                                                }
+                                            </Button>
                                         </Box>
                                     </Box>
                                     {!!emailCodeError && (
@@ -403,20 +409,16 @@ export default function SignupForm() {
                             </Box>
 
                             <Button type="submit" variant="contained" color="primary" disabled={!isEmailVerified || signupComplite} fullWidth sx={{ mt: 3, fontSize: 18 }}>
-                                회원 가입
+                                {registerLoading ? (
+                                    <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                                ) : "회원 가입"
+                                }
                             </Button>
 
                         </Box>
                     </Paper>
                 </Box>
             </form>
-            <AlertModal 
-              open={modalOpen}
-              buttonCount={1}
-              onClose={redirectToLogin}
-              content='회원가입을 완료했습니다.'
-              confirmText='로그인 화면으로 돌아가기'
-              />
         </>
     );
 }

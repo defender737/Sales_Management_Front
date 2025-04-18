@@ -9,7 +9,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid2'
 import PageTitle from '../components/PageTitle'
-import { useAuthStore } from '../stores/UseAuthStore'
+import { useAuthStore } from '../stores/useAuthStore'
 import { useNavigate, Link } from 'react-router-dom'
 import AddIcon from '@mui/icons-material/Add';
 
@@ -30,11 +30,9 @@ const businessType = {
 export default function MyPage() {
     const { user } = useAuthStore();
     const navigate = useNavigate();
-
     return (
         <Box sx={{ mx: 'auto' }}>
             <PageTitle title={pageTitle.title} subTitle={pageTitle.subTitle} />
-
             <Grid container spacing={3}>
                 {user?.storeList.map((store) => (
                     <Grid size={{ xs: 12, sm: 6, md: 4 }} key={store.id}>
@@ -75,7 +73,7 @@ export default function MyPage() {
                 ))}
             </Grid>
             <Box sx={{ display: "flex", justifyContent: "right", mt: 2 }}>
-                <Button variant="contained" size="large" sx={{ ml: 2 }} component={Link} to={'/myStore/create'}><AddIcon sx={{ mr: 1 }}/>매장 추가하기</Button>
+                <Button variant="contained" size="large" sx={{ ml: 2 }} component={Link} to={'/myStore/create'}><AddIcon sx={{ mr: 1 }} />매장 추가하기</Button>
             </Box>
         </Box>
     );
