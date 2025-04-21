@@ -77,7 +77,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
       { delay: true }
     );
 
-  const { request: getRequest, reset: getReset } =
+  const { request: getRequest} =
     useApiRequest(
       (rowId: number) => getSalesRecords(rowId),
       (response) => {
@@ -95,7 +95,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
           etc: response.data.etc,
         });
       },
-      (msg) => showSnackbar("기록 정보를 가져오지 못했습니다.", "error")
+      (msg) => showSnackbar(msg, "error")
     )
 
   useEffect(() => {
@@ -137,13 +137,16 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
         <Box sx={{ flex: 1 }}>
           <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>구분</Typography>
           <FormControl component="fieldset" fullWidth>
-            <RadioGroup
-              row
-              {...register('type')}
-            >
-              <FormControlLabel value="SALES" control={<Radio />} label="매출" />
-              <FormControlLabel value="EXPENSES" control={<Radio />} label="지출" />
-            </RadioGroup>
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup row {...field} onChange={(e) => field.onChange(e.target.value)}>
+                  <FormControlLabel value="SALES" control={<Radio />} label="매출" />
+                  <FormControlLabel value="EXPENSES" control={<Radio />} label="지출" />
+                </RadioGroup>
+              )}
+              />
           </FormControl>
         </Box>
       </Box>

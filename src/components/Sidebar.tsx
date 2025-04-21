@@ -127,7 +127,7 @@ export default function Sidebar() {
         <Divider />
         <List>
           <ListItem key={"대시보드"} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton
+            <ListItemButton component={Link} to={'/dashboard'}
               sx={[
                 {
                   minHeight: 48,

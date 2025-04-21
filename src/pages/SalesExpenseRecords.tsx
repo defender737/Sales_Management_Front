@@ -65,7 +65,7 @@ export default function SalesExpenseRecords() {
         setData(indexedData);
         setTotalPages(response.data.totalPages);
       },
-      (msg) => showSnackbar("기록 리스트를 가져오지 못했습니다.", "error")
+      (msg) => showSnackbar(msg, "error")
     )
 
   const getRequest = useCallback(() => {

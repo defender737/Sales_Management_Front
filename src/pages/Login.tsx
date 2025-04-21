@@ -76,7 +76,7 @@ export default function Login() {
                         </Box>
                         <Button type='submit' variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: 18 }}>
                             {loginLoading ? (
-                                <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                                <CircularProgress size={31} sx={{ color: 'inherit' }} />
                             ) : "로그인"
                             }
                         </Button>

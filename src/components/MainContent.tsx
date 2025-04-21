@@ -8,6 +8,7 @@ import NoStorePromptPage from "../pages/NoStorePromptPage";
 import StoreForm from "../pages/StoreForm"
 import MyPage from "../pages/MyPage";
 import MyStore from "../pages/MyStore";
+import Dashboard from "../pages/Dashboard";
 
 const MainContent = () => {
   const { user } = useAuthStore();
@@ -24,6 +25,7 @@ const MainContent = () => {
       <Route path="/myStore/edit/:id" element={<StoreForm />} />
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/myStore" element={<MyStore />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       </Route>
     </Routes>
   </Box>
