@@ -36,7 +36,7 @@ export default function App() {
                   element={
                     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
                       <Sidebar />
-                      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0, overflowX: 'hidden' }}>
                         <MainContent />
                         <Footer />
                       </Box>

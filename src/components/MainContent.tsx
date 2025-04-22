@@ -16,7 +16,7 @@ const MainContent = () => {
   // const storerList = new Array(0)
   const isStoreExsist = (storerList !== undefined && storerList.length >0 && storerList) ? true : false
   return (
-  <Box component="main" sx={{ flexGrow: 1, p: 5, bgcolor: "white" }}>
+  <Box component="main" sx={{ flexGrow: 1, p: 5, bgcolor: "white", minWidth: 0 }}>
     <Toolbar />
     <Routes>
       <Route element={<PrivateRoute />}>
