@@ -9,6 +9,7 @@ import StoreForm from "../pages/StoreForm"
 import MyPage from "../pages/MyPage";
 import MyStore from "../pages/MyStore";
 import Dashboard from "../pages/Dashboard";
+import DeliveryManagement from "../pages/DeliveryManagement";
 
 const MainContent = () => {
   const { user } = useAuthStore();
@@ -26,6 +27,7 @@ const MainContent = () => {
       <Route path="/mypage" element={<MyPage />} />
       <Route path="/myStore" element={<MyStore />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/deliveryManagement" element={<DeliveryManagement />} />
       </Route>
     </Routes>
   </Box>

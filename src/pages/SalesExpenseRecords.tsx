@@ -20,9 +20,9 @@ const salesColumns = [
   { key: "no", label: "No.", width: "8%" },
   { key: "date", label: "날짜", width: "15%" },
   { key: "amount", label: "금액", width: "15%" },
-  { key: "type", label: "구분", width: "15%" },
-  { key: "description", label: "상세", width: "auto" },
-  { key: "payment", label: "결제 수단", width: "15%" },
+  { key: "typeKo", label: "구분", width: "15%" },
+  { key: "detailKo", label: "상세", width: "auto" },
+  { key: "paymentKo", label: "결제 수단", width: "15%" },
   { key: "etc", label: "비고", width: "15%" },
 ];
 

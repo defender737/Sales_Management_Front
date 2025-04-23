@@ -1,6 +1,6 @@
 // src/api/api.ts
 import axios from 'axios';
-import { registerForm, storeForm, getSalesRecordList } from '../types/types'
+import { registerForm, storeForm, getSalesRecordList, DeliveryPlatform } from '../types/types'
 import { setAccessToken, getAccessToken } from '../stores/useAuthStore'
 
 const api = axios.create({
@@ -105,7 +105,7 @@ export const createSalesRecord = (storeId : number, record: {
   date: string;
   type: string;
   amount: number;
-  description: string;
+  detail: string;
   payment: string;
   etc: string;
 }) => {
@@ -116,7 +116,7 @@ export const updateSalesRecord = (id: number, record: {
   date: string;
   type: string;
   amount: number;
-  description: string;
+  detail: string;
   payment: string;
   etc: string;
 }) => {
@@ -217,4 +217,12 @@ export const logout = () => {
 
 export const withdraw = () => {
   return api.delete('/user');
+}
+
+export const getDelveryPlatformInfo = (storeId : number) => {
+  return api.get(`/deliveryPlatform/${storeId}`);
+}
+
+export const updateDelveryPlatformInfo = (storeId : number, data : DeliveryPlatform) => {
+  return api.put(`/deliveryPlatform/${storeId}`, data);
 }

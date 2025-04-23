@@ -1,9 +1,8 @@
 import { Box, Typography, TextField, Button, Checkbox, FormControlLabel, Link, Paper, Divider, CircularProgress } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useForm } from 'react-hook-form';
-import { login, initUserData } from '../api/api'
+import { login } from '../api/api'
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useApiRequest } from '../hooks/useApiRequest';
 import { useFetchCurrentUser } from '../hooks/useFetchCurrentUser';

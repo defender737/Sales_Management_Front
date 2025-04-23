@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Box,
@@ -23,6 +23,25 @@ import { useApiRequest } from '../hooks/useApiRequest';
 import { utils } from '../utils/util'
 import CheckIcon from '@mui/icons-material/Check';
 
+enum SalesDetail {
+  OFFLINE = '오프라인 매출',
+  ONLINE = '온라인 매출',
+  ETC = '기타',
+}
+
+enum ExpensesDetail {
+  SALARY = '급여',
+  MATERIAL = '재료비',
+  MAINTENANCE = '관리비',
+  RENT = '임대료',
+  COMMUNICATION = '통신비',
+  MEALS = '식비',
+  ADVERTISING = '광고비',
+  DELIVERY = '배송비',
+  HVAC = '냉.난방비',
+  ETC = '기타',
+}
+
 interface RecordFormProps {
   mode: 'create' | 'edit'
   rowId?: number
@@ -33,18 +52,23 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
   const isEdit = mode === 'edit';
   const showSnackbar = useContext(SnackbarContext)
   const { selectedStoreId } = useSelectedStore();
-  const { register, handleSubmit, control, setValue, getValues, reset } = useForm<SalesRecordForm>({
+  const { register, handleSubmit, control, setValue, getValues, reset, watch } = useForm<SalesRecordForm>({
     defaultValues: {
       amount: 0,
       date: new Date().toISOString().split('T')[0],
       type: 'SALES',
-      description: '',
+      detail: '',
       payment: 'ETC',
       etc: '',
     },
   });
 
-  const { request: createRequest, loading: createLoading, success: createSuccess, reset: createReset } =
+  const type = watch('type');
+  const descriptionOptions = type === 'SALES'
+    ? Object.entries(SalesDetail).map(([value, label]) => ({ value, label }))
+    : Object.entries(ExpensesDetail).map(([value, label]) => ({ value, label }));
+
+  const { request: createRequest, loading: createLoading, success: createSuccess} =
     useApiRequest(
       (storeId: number, form: SalesRecordForm) => createSalesRecord(storeId, form),
       () => {
@@ -55,7 +79,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
       { delay: true }
     );
 
-  const { request: updateRequest, loading: updateLoading, success: updateSuccess, reset: updateReset } =
+  const { request: updateRequest, loading: updateLoading, success: updateSuccess} =
     useApiRequest(
       (rowId: number, form: SalesRecordForm) => updateSalesRecord(rowId, form),
       () => {
@@ -66,7 +90,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
       { delay: true }
     );
 
-  const { request: deleteRequest, loading: deleteLoading, success: deleteSuccess, reset: deleteeReset } =
+  const { request: deleteRequest, loading: deleteLoading, success: deleteSuccess} =
     useApiRequest(
       (rowId: number) => deleteSalesRecord(rowId),
       () => {
@@ -77,21 +101,16 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
       { delay: true }
     );
 
-  const { request: getRequest} =
+  const { request: getRequest } =
     useApiRequest(
       (rowId: number) => getSalesRecords(rowId),
       (response) => {
         reset({
           amount: response.data.amount,
           date: response.data.date,
-          type: response.data.type === "매출" ? "SALES" : "EXPENSES",
-          description: response.data.description,
-          payment:
-            response.data.payment === "카드" ? "CARD"
-              :
-              response.data.payment === "현금" ? "CASH"
-                :
-                "ETC",
+          type: response.data.type,
+          detail : response.data.detail,
+          payment:response.data.payment,
           etc: response.data.etc,
         });
       },
@@ -125,15 +144,16 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
 
   return (
     <Box component="form" onSubmit={handleSubmit(isEdit ? onUpdate : onCreate)} sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: 800 }}>
+      <Box sx={{ flex: 1 }}>
+        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>날짜</Typography>
+        <TextField
+          type="date"
+          {...register('date')}
+          fullWidth
+        />
+      </Box>
+
       <Box sx={{ display: 'flex', gap: 4 }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>날짜</Typography>
-          <TextField
-            type="date"
-            {...register('date')}
-            fullWidth
-          />
-        </Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>구분</Typography>
           <FormControl component="fieldset" fullWidth>
@@ -141,12 +161,34 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
               name="type"
               control={control}
               render={({ field }) => (
-                <RadioGroup row {...field} onChange={(e) => field.onChange(e.target.value)}>
+                <RadioGroup row {...field} onChange={(e) => field.onChange(e.target.value)} sx={{ display: 'flex', }}>
                   <FormControlLabel value="SALES" control={<Radio />} label="매출" />
                   <FormControlLabel value="EXPENSES" control={<Radio />} label="지출" />
                 </RadioGroup>
               )}
-              />
+            />
+          </FormControl>
+        </Box>
+
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>상세</Typography>
+          <FormControl required fullWidth>
+            <Controller
+              name="detail"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  fullWidth
+                >
+                  {descriptionOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
           </FormControl>
         </Box>
       </Box>
@@ -210,15 +252,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
         </Box>
       </Box>
 
-      <Box>
-        <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>상세</Typography>
-        <TextField
-          {...register('description')}
-          multiline
-          rows={2}
-          fullWidth
-        />
-      </Box>
+
 
       <Box>
         <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>비고</Typography>

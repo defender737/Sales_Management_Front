@@ -12,9 +12,10 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import BarChartIcon from "@mui/icons-material/BarChart";
+import AttachMoney from "@mui/icons-material/AttachMoney";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import SettingsIcon from "@mui/icons-material/Settings";
+import DeliveryDining from "@mui/icons-material/DeliveryDining";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import Header from './Header';
@@ -82,8 +83,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const menuItems1 = [
   { text: "매출/지출 기록", icon: <MonetizationOnIcon />, path: "/sales-expenses" },
-  { text: "메출 통계", icon: <BarChartIcon />, path: "/Login" },
-  { text: "순매출 관리", icon: <SettingsIcon />, path: "/" }
+  { text: "배달 기록", icon: <DeliveryDining />, path: "/Login" },
+  { text: "배달 관리", icon: <AttachMoney />, path: "/deliveryManagement" }
 ];
 
 const menuItems2 = [
