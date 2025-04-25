@@ -33,7 +33,7 @@ import { useAlertModal } from '../stores/useAlertModal';
 
 const emailDomains = ['gmail.com', 'naver.com', 'daum.net', 'kakao.com'];
 
-export default function SignupForm() {
+export default function SignupPage() {
 
     const codeRef = useRef<HTMLInputElement>(null);
     const showSnackbar = React.useContext(SnackbarContext);

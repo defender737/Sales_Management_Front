@@ -21,7 +21,7 @@ const pageTitle = {
   subTitle: '',
 }
 
-export default function DeliveryManagement() {
+export default function DeliveryManagementPage() {
   const methods = useForm();
   const { selectedStoreId } = useSelectedStore();
   const showSnackbar = useContext(SnackbarContext)

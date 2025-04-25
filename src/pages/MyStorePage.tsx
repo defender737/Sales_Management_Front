@@ -27,7 +27,7 @@ const businessType = {
     ETC: '기타'
 };
 
-export default function MyPage() {
+export default function MyStorePage() {
     const { user } = useAuthStore();
     const navigate = useNavigate();
     return (

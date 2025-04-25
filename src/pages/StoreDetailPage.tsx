@@ -44,7 +44,7 @@ const categories = [
   { key: 'ETC', value: '기타' }
 ];
 
-export default function AddStoreForm() {
+export default function StoreDetailPage() {
   const { handleSubmit, control, setValue, reset } = useForm();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);

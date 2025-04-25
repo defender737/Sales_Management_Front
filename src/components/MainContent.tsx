@@ -1,16 +1,15 @@
-import React from "react";
 import {Routes, Route} from "react-router-dom";
 import { Box, Toolbar} from "@mui/material";
-import ExpenseRecords from "../pages/ExpenseRecords";
+import ExpenseRecordsPage from "../pages/ExpenseRecordsPage";
 import PrivateRoute from "./routingComponents/PrivateRoute";
 import {useAuthStore} from "../stores/useAuthStore"
 import NoStorePromptPage from "../pages/NoStorePromptPage";
-import StoreForm from "../pages/StoreForm"
+import StoreDetailPage from "../pages/StoreDetailPage"
 import MyPage from "../pages/MyPage";
-import MyStore from "../pages/MyStore";
+import MyStorePage from "../pages/MyStorePage";
 import Dashboard from "../pages/Dashboard";
-import DeliveryManagement from "../pages/DeliveryManagement";
-import SalesRecord from "../pages/SalesRecords";
+import DeliveryManagementPage from "../pages/DeliveryManagementPage";
+import SalesRecordsPage from "../pages/SalesRecordsPage";
 
 const MainContent = () => {
   const { user } = useAuthStore();
@@ -23,13 +22,13 @@ const MainContent = () => {
     <Routes>
       <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={isStoreExsist ? <Dashboard /> : <NoStorePromptPage />} />
-      <Route path="/salesRecord" element={isStoreExsist ? <SalesRecord /> : <NoStorePromptPage />} />
-      <Route path="/expenseRecord" element={isStoreExsist ? <ExpenseRecords /> : <NoStorePromptPage />} />
-      <Route path="/deliveryManagement" element={isStoreExsist ? <DeliveryManagement /> : <NoStorePromptPage />} />
+      <Route path="/salesRecord" element={isStoreExsist ? <SalesRecordsPage /> : <NoStorePromptPage />} />
+      <Route path="/expenseRecord" element={isStoreExsist ? <ExpenseRecordsPage /> : <NoStorePromptPage />} />
+      <Route path="/deliveryManagement" element={isStoreExsist ? <DeliveryManagementPage /> : <NoStorePromptPage />} />
 
-      <Route path="/myStore" element={<MyStore />} />
-      <Route path="/myStore/create" element={<StoreForm />} />
-      <Route path="/myStore/edit/:id" element={<StoreForm />} />
+      <Route path="/myStore" element={<MyStorePage />} />
+      <Route path="/myStore/create" element={<StoreDetailPage />} />
+      <Route path="/myStore/edit/:id" element={<StoreDetailPage />} />
       
       <Route path="/mypage" element={<MyPage />} />
       </Route>

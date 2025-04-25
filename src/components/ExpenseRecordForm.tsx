@@ -28,7 +28,7 @@ enum ExpensesDetail {
   COMMUNICATION = '통신비',
   MEALS = '식비',
   ADVERTISING = '광고비',
-  DELIVERYFEE = '배송비',
+  DELIVERY = '배송비',
   HVAC = '냉.난방비',
   ETC = '기타',
 }
@@ -39,7 +39,7 @@ interface RecordFormProps {
   handleSubbmitAndClose: () => void;
 }
 
-export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: RecordFormProps) {
+export default function ExpenseRecordForm({ mode, handleSubbmitAndClose, rowId }: RecordFormProps) {
   const isEdit = mode === 'edit';
   const showSnackbar = useContext(SnackbarContext)
   const { selectedStoreId } = useSelectedStore();

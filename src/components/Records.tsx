@@ -4,9 +4,9 @@ import { Box, Button, CircularProgress, Container, IconButton, Pagination, Tab, 
 import { useApiRequest } from '../hooks/useApiRequest';
 import { useFormModal } from '../stores/useFormModal';
 import { SnackbarContext } from '../contexts/SnackbarContext'
-import PageTitle from '../components/PageTitle';
-import Table from '../components/Table';
-import SelectSmall from '../components/SelectSmall';
+import PageTitle from './PageTitle';
+import Table from './Table';
+import SelectSmall from './SelectSmall';
 import AddIcon from '@mui/icons-material/Add';
 import { SelectChangeEvent } from '@mui/material/Select';
 import SearchIcon from '@mui/icons-material/Search';
@@ -23,9 +23,11 @@ interface RecordsProps<T, F> {
     pageTitle: { title: string; subTitle: string };
     columns: { key: string, label: string, width: string }[]
     requestApi: (filter: F) => Promise<any>;
-    tabsOptions: { value: string; label: string }[];
-    getFilterParams: () => F;  
+    tabsOptions?: { value: string; label: string }[];
     renderForm: (mode: 'create' | 'edit', rowId: number | undefined, close: () => void) => JSX.Element;
+    mergeFilterParams?: (baseFilter: any) => any;
+    filterValue?: string;
+    setFilterValue?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function Records<T extends { id: number }, F>({
@@ -34,9 +36,10 @@ export default function Records<T extends { id: number }, F>({
     requestApi,
     renderForm,
     tabsOptions,
-    getFilterParams
+    mergeFilterParams,
+    filterValue,
+    setFilterValue
 }: RecordsProps<T, F>) {
-    const [paymentValue, setPaymentValue] = useState('all');
     const [data, setData] = useState<T[]>([]);
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -67,10 +70,17 @@ export default function Records<T extends { id: number }, F>({
 
     const getRequest = useCallback(() => {
         if (typeof selectedStoreId === 'number' && selectedStoreId > 0) {
-            const filterParams = getFilterParams();
-            request(filterParams);
+            const baseFilter = {
+                storeId: selectedStoreId,
+                page: page - 1,
+                size: 10,
+                order: sortOrder,
+                startDate,
+                endDate};
+            const finalFilter = mergeFilterParams ? mergeFilterParams(baseFilter) : baseFilter;
+            request(finalFilter);
         }
-    }, [selectedStoreId, page, sortOrder, paymentValue, startDate, endDate, refreshTrigger]);
+    }, [selectedStoreId, page, sortOrder, filterValue, startDate, endDate, refreshTrigger]);
 
     useEffect(() => {
         getRequest();
@@ -136,8 +146,11 @@ export default function Records<T extends { id: number }, F>({
     }
 
     // 탭 변경 이벤트 핸들러
-    const handleTypeTabChange = (event: React.SyntheticEvent, value: string) => {
-        setPaymentValue(value);
+    const handleTabChange = (event: React.SyntheticEvent, value: string) => {
+        if (setFilterValue) {
+            setFilterValue(value);
+            setPage(1); // 필터 변경 시 페이지 초기화
+        }
     };
 
     return (
@@ -152,9 +165,10 @@ export default function Records<T extends { id: number }, F>({
                 minWidth: '320px', // 최소 너비 설정 (필요에 따라 조정)
             }}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <Tabs value={paymentValue} onChange={handleTypeTabChange} aria-label="tab">
+                    <Tabs value={filterValue || "ALL"} onChange={handleTabChange} aria-label="tab">
+                        <Tab value='ALL' label="전체" />
                         {
-                            tabsOptions.map((option) => (
+                            tabsOptions?.map((option) => (
                                 <Tab key={option.value} value={option.value} label={option.label} />
                             ))
                         }

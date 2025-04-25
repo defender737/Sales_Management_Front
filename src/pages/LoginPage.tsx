@@ -12,9 +12,9 @@ interface LoginForm {
     password: string;
 }
 
-export default function Login() {
+export default function LoginPage() {
 
-    const { setUser, setAccessToken } = useAuthStore();
+    const { setAccessToken } = useAuthStore();
     const {fetchCurrentUser} = useFetchCurrentUser();
 
     const { register, handleSubmit } = useForm<LoginForm>();

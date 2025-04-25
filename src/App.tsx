@@ -5,8 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Sidebar from "./components/Sidebar";
 import Footer from "./components/Footer"
 import MainContent from "./components/MainContent";
-import Login from "./pages/Login";
-import SignupForm from "./pages/SignupForm";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 import { SnackbarProvider } from './components/SnackbarProvier';
 import PublicOnlyRoute from './components/routingComponents/PublicOnlyRoute';
 import RedirectRoute from './components/routingComponents/RedirectRoute';
@@ -27,8 +27,8 @@ export default function App() {
                 <Route path="/" element={<RedirectRoute />} />
 
                 <Route element={<PublicOnlyRoute />}>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignupForm />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignupPage />} />
                 </Route>
                 {/* <Route path="*" element={<NotFound />} /> */}
                 <Route
