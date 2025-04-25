@@ -8,6 +8,7 @@ import {
   Select,
   FormControl,
   Avatar,
+  CircularProgress,
 } from '@mui/material';
 import { useState, useContext, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
@@ -83,7 +84,7 @@ export default function AddStoreForm() {
     }
   }, [id])
 
-  const { request: createOrUpdateRequest } = useApiRequest(
+  const { request: createOrUpdateRequest, loading : createOrUpdateLoading} = useApiRequest(
     (data) => isEdit ? updateStore(Number(id), data, imageFile) : createStore(data, imageFile),
     () => {
       const message = isEdit ? "매장 정보를 수정했습니다" : "새로운 매장이 등록되었습니다"
@@ -96,9 +97,10 @@ export default function AddStoreForm() {
       })
     },
     (msg) => showSnackbar(msg, "error"),
+    {delay: true}
   )
 
-  const { request: deleteRequest } = useApiRequest(
+  const { request: deleteRequest, loading : deleteLoading } = useApiRequest(
     () => deleteStore(Number(id)),
     () => {
       const message = "매장을 삭제했습니다."
@@ -261,11 +263,11 @@ export default function AddStoreForm() {
           />
           <Box sx={{ display: 'flex', width: "100%", justifyContent: 'flex-end' }}>
             {isEdit &&
-              <Button onClick={handleDeleteButton} variant="contained" color="error" size='large' sx={{ width: 130, mr: 2 }}>
-                매장 삭제
+              <Button disabled={deleteLoading} onClick={handleDeleteButton} variant="contained" color="error" size='large' sx={{ width: 130, mr: 2 }}>
+                {deleteLoading ? <CircularProgress size={20} color='inherit' /> : "매장 삭제"}
               </Button>}
-            <Button type="submit" variant="contained" color="primary" size='large' sx={{ width: 130 }}>
-              {isEdit ? "정보 수정" : "매장 추가"}
+            <Button disabled = {createOrUpdateLoading} type="submit" variant="contained" color="primary" size='large' sx={{ width: 130 }}>
+              {createOrUpdateLoading ? <CircularProgress size={20} color='inherit' /> : isEdit ? "정보 수정" : "매장 추가"}
             </Button>
           </Box>
         </Box>

@@ -10,24 +10,15 @@ import {
   Chip,
   Typography,
   InputAdornment,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   CircularProgress,
 } from '@mui/material';
-import { createSalesRecord, getSalesRecords, updateSalesRecord, deleteSalesRecord } from '../api/api'
-import { SalesRecordForm } from '../types/types'
+import { createExpenseRecord, getExpenseRecord, updateSalesRecord, deleteExpenseRecord } from '../api/api'
+import { ExpenseRecordFormRequest } from '../types/types'
 import { SnackbarContext } from '../contexts/SnackbarContext';
 import { useSelectedStore } from '../stores/useSelectedStore'
 import { useApiRequest } from '../hooks/useApiRequest';
 import { utils } from '../utils/util'
 import CheckIcon from '@mui/icons-material/Check';
-
-enum SalesDetail {
-  OFFLINE = '오프라인 매출',
-  ONLINE = '온라인 매출',
-  ETC = '기타',
-}
 
 enum ExpensesDetail {
   SALARY = '급여',
@@ -37,7 +28,7 @@ enum ExpensesDetail {
   COMMUNICATION = '통신비',
   MEALS = '식비',
   ADVERTISING = '광고비',
-  DELIVERY = '배송비',
+  DELIVERYFEE = '배송비',
   HVAC = '냉.난방비',
   ETC = '기타',
 }
@@ -52,25 +43,21 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
   const isEdit = mode === 'edit';
   const showSnackbar = useContext(SnackbarContext)
   const { selectedStoreId } = useSelectedStore();
-  const { register, handleSubmit, control, setValue, getValues, reset, watch } = useForm<SalesRecordForm>({
+  const { register, handleSubmit, control, setValue, getValues, reset} = useForm<ExpenseRecordFormRequest>({
     defaultValues: {
       amount: 0,
       date: new Date().toISOString().split('T')[0],
-      type: 'SALES',
       detail: '',
       payment: 'ETC',
       etc: '',
     },
   });
 
-  const type = watch('type');
-  const descriptionOptions = type === 'SALES'
-    ? Object.entries(SalesDetail).map(([value, label]) => ({ value, label }))
-    : Object.entries(ExpensesDetail).map(([value, label]) => ({ value, label }));
+  const descriptionOptions = Object.entries(ExpensesDetail).map(([value, label]) => ({ value, label }));
 
   const { request: createRequest, loading: createLoading, success: createSuccess} =
     useApiRequest(
-      (storeId: number, form: SalesRecordForm) => createSalesRecord(storeId, form),
+      (storeId: number, form: ExpenseRecordFormRequest) => createExpenseRecord(storeId, form),
       () => {
         showSnackbar("기록을 추가했습니다.", "success");
         setTimeout(() => handleSubbmitAndClose(), 1500);
@@ -81,7 +68,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
 
   const { request: updateRequest, loading: updateLoading, success: updateSuccess} =
     useApiRequest(
-      (rowId: number, form: SalesRecordForm) => updateSalesRecord(rowId, form),
+      (rowId: number, form: ExpenseRecordFormRequest) => updateSalesRecord(rowId, form),
       () => {
         showSnackbar("기록을 수정했습니다.", "success");
         setTimeout(() => handleSubbmitAndClose(), 1500);
@@ -92,7 +79,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
 
   const { request: deleteRequest, loading: deleteLoading, success: deleteSuccess} =
     useApiRequest(
-      (rowId: number) => deleteSalesRecord(rowId),
+      (rowId: number) => deleteExpenseRecord(rowId),
       () => {
         showSnackbar("기록을 삭제했습니다.", "success");
         setTimeout(() => handleSubbmitAndClose(), 1500);
@@ -103,12 +90,11 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
 
   const { request: getRequest } =
     useApiRequest(
-      (rowId: number) => getSalesRecords(rowId),
+      (rowId: number) => getExpenseRecord(rowId),
       (response) => {
         reset({
           amount: response.data.amount,
           date: response.data.date,
-          type: response.data.type,
           detail : response.data.detail,
           payment:response.data.payment,
           etc: response.data.etc,
@@ -123,12 +109,12 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
     }
   }, [isEdit, rowId]);
 
-  const onCreate = (data: SalesRecordForm) => {
+  const onCreate = (data: ExpenseRecordFormRequest) => {
     if (!selectedStoreId) return showSnackbar("메장 정보를 찾을 수 없습니다.", "error");
     createRequest(selectedStoreId, data);
   };
 
-  const onUpdate = (data: SalesRecordForm) => {
+  const onUpdate = (data: ExpenseRecordFormRequest) => {
     if (!rowId) return showSnackbar("기록 정보를 찾을 수 없습니다.", "error");
     updateRequest(rowId, data);
   };
@@ -152,24 +138,7 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
           fullWidth
         />
       </Box>
-
-      <Box sx={{ display: 'flex', gap: 4 }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>구분</Typography>
-          <FormControl component="fieldset" fullWidth>
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <RadioGroup row {...field} onChange={(e) => field.onChange(e.target.value)} sx={{ display: 'flex', }}>
-                  <FormControlLabel value="SALES" control={<Radio />} label="매출" />
-                  <FormControlLabel value="EXPENSES" control={<Radio />} label="지출" />
-                </RadioGroup>
-              )}
-            />
-          </FormControl>
-        </Box>
-
+      <Box>
         <Box sx={{ flex: 1 }}>
           <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>상세</Typography>
           <FormControl required fullWidth>
@@ -281,6 +250,6 @@ export default function RecordForm({ mode, handleSubbmitAndClose, rowId }: Recor
             </Button>
           </Box>
       }
-    </Box>
+      </Box>
   );
 };

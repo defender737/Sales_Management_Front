@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from "react-router-dom";
 import { requestEmailVerification, requestEmailCodeVerification, register } from '../api/api';
-import { registerWithoutEmailVerified } from '../types/types';
+import { registerWithoutEmailVerified, registerForm } from '../types/types';
 import {
     Box,
     Paper,
@@ -51,8 +51,8 @@ export default function SignupForm() {
 
     const { request: registerRequest, loading: registerLoading } =
         useApiRequest(
-            (data: registerWithoutEmailVerified, isEmailVerified: boolean, email: string) =>
-                register({ ...data, isEmailVerified: isEmailVerified, email: email }),
+            (data: registerForm) =>
+                register(data),
             () => {
                 setSignupComplite(true);
                 openAlert({
@@ -117,7 +117,7 @@ export default function SignupForm() {
             alert("이미 회원가입이 완료되었습니다.");
             return;
         }
-        registerRequest(data, isEmailVerified, email)
+        registerRequest({...data, isEmailVerified : isEmailVerified, email : email})
     };
 
     const emailVarify = async () => {

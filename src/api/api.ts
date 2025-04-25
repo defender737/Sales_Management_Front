@@ -1,6 +1,12 @@
 // src/api/api.ts
 import axios from 'axios';
-import { registerForm, storeForm, getSalesRecordList, DeliveryPlatform } from '../types/types'
+import { 
+  registerForm,
+  storeForm,
+  ExpenseRecordFormRequest,
+  RequestExpenseRecordsList,
+  DeliveryPlatform
+} from '../types/types'
 import { setAccessToken, getAccessToken } from '../stores/useAuthStore'
 
 const api = axios.create({
@@ -10,10 +16,8 @@ const api = axios.create({
   },
   withCredentials: true, // 쿠키를 포함하여 요청
 });
-
 let isRefreshing = false;
 let failedQueue: any[] = [];
-
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom: any) => {
     if (error) {
@@ -24,10 +28,8 @@ const processQueue = (error: any, token: string | null = null) => {
   });
 
   failedQueue = [];
-}
-
+};
 const setToken = setAccessToken;
-
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -77,7 +79,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
@@ -91,138 +92,148 @@ api.interceptors.request.use(
   }
 );
 
-// 매장별 매출 내역 조회
-export const getSalesRecordsList = (params : getSalesRecordList) => {
+/**
+ * 지출 기록 관리 API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 지출 기록 목록 조회 (필터 조건 가능)
+ * - 특정 지출 기록 상세 조회 (ID로 조회)
+ * - 새로운 지출 기록 생성 (지정한 매장에 기록 추가)
+ * - 기존 지출 기록 수정 (ID로 수정)
+ * - 지출 기록 삭제 (ID로 삭제)
+ */
+export const getExpenseRecordsList = (params : RequestExpenseRecordsList) => {
   return api.get('records', { params });
 };
-
-export const getSalesRecords = (id: number) => {
+export const getExpenseRecord = (id: number) => {
   return api.get(`records/${id}`)
 }
-
-// 매출/지출 기록 생성
-export const createSalesRecord = (storeId : number, record: {
-  date: string;
-  type: string;
-  amount: number;
-  detail: string;
-  payment: string;
-  etc: string;
-}) => {
+export const createExpenseRecord = (storeId : number, record: ExpenseRecordFormRequest) => {
   return api.post(`records?storeId=${storeId}`, record);
 };
-
-export const updateSalesRecord = (id: number, record: {
-  date: string;
-  type: string;
-  amount: number;
-  detail: string;
-  payment: string;
-  etc: string;
-}) => {
+export const updateSalesRecord = (id: number, record: ExpenseRecordFormRequest) => {
   return api.put(`records/${id}`, record)
 }
-
-export const deleteSalesRecord = (id: number) => {
+export const deleteExpenseRecord = (id: number) => {
   return api.delete(`records/${id}`)
 }
 
+/**
+ * 회원 가입 API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 이메일 발송 코드 오쳥(이메일로 요청)
+ * - 이메일 발송 코드 인증(이메일과 이메일 코드로 요청)
+ * - 회원가입
+ */
 export const requestEmailVerification = (email: string) => {
   return api.post('auth/email/verify-request', { email })
 }
-
 export const requestEmailCodeVerification = (email: string, code: string) => {
   return api.post('auth/email/verify-check', { email, code })
 }
-
 export const register = (registerForm: registerForm) => {
   return api.post('auth/signup', registerForm)
 }
 
+/**
+ * 로그인 및 토큰 리프레쉬 API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 로그인
+ * - 리프레쉬 토큰으 이용한 엑세스토큰 재요청
+ * - 로그인 후 사용자 정보 요청
+ */
 export const login = (loginForm: { email: string, password: string }) => {
   return api.post('auth/login', loginForm)
 }
-
 export const reissueAccessToken = () => {
   return api.post('auth/reissue', {}, { headers: { 'X-Reissue': 'true' } })
 }
-
 export const initUserData = () => {
   return api.get('user/me')
 }
+export const logout = () => {
+  return api.post('/auth/logout');
+}
 
+/**
+ * 매장 API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 매장 생성(이미지 파일 포함)
+ * - 매장 수정(이미지 파일 포함)
+ * - 매장 삭제
+ */
 export const createStore = (storeData: storeForm, imageFile: File | null) => {
   const formData = new FormData();
-
   formData.append('store', new Blob([JSON.stringify(storeData)], { type: 'application/json' }));
-
   if (imageFile) {
     formData.append('image', imageFile);
   }
-
   return api.post('store', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
   });
 }
-
-export const updateUser = (userData: { name: string, phone: string }, imageFile: File | null) => {
-  const formData = new FormData();
-
-  formData.append('user', new Blob([JSON.stringify(userData)], { type: 'application/json' }));
-
-  if (imageFile) {
-    formData.append('image', imageFile);
-  }
-
-  return api.put(`user`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  });
-}
-
-export const updateEmailConsent = (emailConsent: boolean) => {
-  return api.patch(`user/emailConsent`, emailConsent);
-}
-
-export const updatePassword = (passwordData: { currentPassword: string, newPassword: string }) => {
-  return api.patch('auth/password', passwordData)
-}
-
 export const updateStore = (storeId: number, storeData: storeForm, imageFile: File | null) => {
   const formData = new FormData();
-
   formData.append('store', new Blob([JSON.stringify(storeData)], { type: 'application/json' }));
-
   if (imageFile) {
     formData.append('image', imageFile);
   }
-
   return api.put(`store/${storeId}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
   });
 }
-
 export const deleteStore = (id: number) => {
   return api.delete(`store/${id}`)
 }
 
-export const logout = () => {
-  return api.post('/auth/logout');
+/**
+ * 유저 정보 API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 유저 정보 수정(이미지 파일 포함)
+ * - 유저 이메일 프로모션 동의 여부 수정(이미지 파일 포함)
+ * - 비밀번호 변경
+ * - 탈퇴
+ */
+export const updateUser = (userData: { name: string, phone: string }, imageFile: File | null) => {
+  const formData = new FormData();
+  formData.append('user', new Blob([JSON.stringify(userData)], { type: 'application/json' }));
+  if (imageFile) {
+    formData.append('image', imageFile);
+  }
+  return api.put(`user`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
 }
-
+export const updateEmailConsent = (emailConsent: boolean) => {
+  return api.patch(`user/emailConsent`, emailConsent);
+}
+export const updatePassword = (passwordData: { currentPassword: string, newPassword: string }) => {
+  return api.patch('auth/password', passwordData)
+}
 export const withdraw = () => {
   return api.delete('/user');
 }
 
+/**
+ * 배달 관리 API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 배달 플랫폼 별 수수료율, 사용 여부 정보 조회
+ * - 배달 플랫폼 별 수수료율, 사용 여부 수정
+ */
 export const getDelveryPlatformInfo = (storeId : number) => {
   return api.get(`/deliveryPlatform/${storeId}`);
 }
-
 export const updateDelveryPlatformInfo = (storeId : number, data : DeliveryPlatform) => {
   return api.put(`/deliveryPlatform/${storeId}`, data);
 }

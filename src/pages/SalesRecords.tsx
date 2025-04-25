@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
-import { SalesRecord, getSalesRecordList } from '../types/types';
-import { getSalesRecordsList } from '../api/api';
+import { ResponseExpenseRecord, RequestExpenseRecordsList } from '../types/types';
+import { getExpenseRecordsList } from '../api/api';
 import { Container, Box, Tabs, Tab, TextField, IconButton, Button, Pagination, ToggleButtonGroup, ToggleButton, Collapse, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -19,17 +19,17 @@ import { utils } from '../utils/util'
 const salesColumns = [
   { key: "no", label: "No.", width: "8%" },
   { key: "date", label: "날짜", width: "15%" },
-  { key: "amount", label: "금액", width: "15%" },
-  { key: "typeKo", label: "구분", width: "15%" },
-  { key: "detailKo", label: "상세", width: "auto" },
-  { key: "paymentKo", label: "결제 수단", width: "15%" },
-  { key: "etc", label: "비고", width: "15%" },
+  { key: "amount", label: "총 매출", width: "15%" },
+  { key: "paymentKo", label: "홀 매출", width: "15%" },
+  { key: "detailKo", label: "배달 매출", width: "15%" },
+  { key: "paymentKo", label: "포장 매출", width: "15%" },
+  { key: "etc", label: "비고", width: "auto" },
 ];
 
 // 페이지 제목
 const pageTitle = {
-  title: "매출 / 지출 기록",
-  subTitle: "매출 및 지출을 기록하고 조회합니다.",
+  title: "매출 기록",
+  subTitle: "매출 내역을 기록하고 조회합니다.",
 }
 // 정렬 방식
 const selectOptions = [
@@ -37,9 +37,9 @@ const selectOptions = [
   { value: 'asc', label: '과거순' },
 ]
 
-export default function SalesExpenseRecords() {
-  const [typeValue, setTypeValue] = useState('all'); // 탭 값 상태 생성
-  const [data, setData] = useState<SalesRecord[]>([]); // 기록 데이터를 저장할 상태 생성
+export default function SalesRecord() {
+  const [paymentValuse, setPaymentValuse] = useState('all'); // 탭 값 상태 생성
+  const [data, setData] = useState<ResponseExpenseRecord[]>([]); // 기록 데이터를 저장할 상태 생성
   const [page, setPage] = useState(1); // 페이지 상태 생성
   const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수 상태 생성
   const [sortOrder, setSortOrder] = useState('desc'); // 정렬 상태 추가
@@ -53,11 +53,11 @@ export default function SalesExpenseRecords() {
 
   const { request, loading: isLoading} =
     useApiRequest(
-      (data: getSalesRecordList) => getSalesRecordsList(data),
+      (data: RequestExpenseRecordsList) => getExpenseRecordsList(data),
       (response) => {
         const totalEl = response.data.totalElements;
         const content = response.data.content;
-        const indexedData = content.map((item: SalesRecord, index: number) => {
+        const indexedData = content.map((item: ResponseExpenseRecord, index: number) => {
           const indexFromTop = (page - 1) * 10 + index;
           const rowNumber = sortOrder === 'desc' ? totalEl - indexFromTop : indexFromTop + 1;
           return { ...item, no: rowNumber };
@@ -75,12 +75,12 @@ export default function SalesExpenseRecords() {
         page: page - 1,
         size: 10,
         order: sortOrder,
-        type: typeValue,
+        payment: paymentValuse,
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
       });
     }
-  }, [selectedStoreId, page, sortOrder, typeValue, startDate, endDate, refreshTrigger]);
+  }, [selectedStoreId, page, sortOrder, paymentValuse, startDate, endDate, refreshTrigger]);
 
   useEffect(() => {
     getRequest();
@@ -108,7 +108,7 @@ export default function SalesExpenseRecords() {
 
   // 탭 변경 이벤트 핸들러
   const handleTypeTabChange = (event: React.SyntheticEvent, value: string) => {
-    setTypeValue(value);
+    setPaymentValuse(value);
   };
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -166,10 +166,8 @@ export default function SalesExpenseRecords() {
         minWidth: '320px', // 최소 너비 설정 (필요에 따라 조정)
       }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={typeValue} onChange={handleTypeTabChange} aria-label="tab">
+          <Tabs value={paymentValuse} onChange={handleTypeTabChange} aria-label="tab">
             <Tab value={"all"} label="전체" />
-            <Tab value={"sales"} label="매출" />
-            <Tab value={'expenses'} label="지출" />
           </Tabs>
         </Box>
         <Box sx={{ mt: 3, ml: 1 }}>
