@@ -1,22 +1,22 @@
 // MainContent에 렌더링할 컴포넌트의 제목타입
-export interface pageTitle {
+export type pageTitle ={
   title: string;
   subTitle: string;
 }
 
 // 지출 기록 RequestType
-export interface RequestExpenseRecordsList {
+export type RequestExpenseRecordsList = {
   storeId: number,
   page: number,
   size: number,
-  order: string,
+  sortOrder: string,
   payment: string,
   startDate?: string,
   endDate?: string
 }
 
 // 지출 기록 ResponseType
-export interface ResponseExpenseRecord {
+export type ResponseExpenseRecord = {
   no?: number,
   id: number;
   amount: number;
@@ -30,6 +30,31 @@ export interface ResponseExpenseRecord {
 
 // 지출 기록 생성 및 수정 RequestType
 export type ExpenseRecordFormRequest = Omit<ResponseExpenseRecord, 'id' | 'no' | 'detailKo' | 'paymentKo'>;
+
+// 매출 기록 ResponseType
+export type ResponseSalesRecord = {
+  no?: number;
+  id: number;
+  date: string;
+  totalAmount: number;
+  HallAmount: number;
+  takeoutAmount: number;
+  deliveryAmount: number;
+  totalCommission: number;
+}
+
+export type SalesRecordFormRequest = {
+  baemin: number;
+  baemin1: number;
+  coupangEats: number;
+  yogiyo: number;
+  ddangyo: number;
+  brandDelivery: number;
+  takeout: number;
+  hall: number;
+  date: string;
+  etc: string;
+}
 
 // 회원가입 요청 타입
 export type registerForm = {

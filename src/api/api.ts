@@ -5,7 +5,8 @@ import {
   storeForm,
   ExpenseRecordFormRequest,
   RequestExpenseRecordsList,
-  DeliveryPlatform
+  DeliveryPlatform,
+  SalesRecordFormRequest
 } from '../types/types'
 import { setAccessToken, getAccessToken } from '../stores/useAuthStore'
 
@@ -103,19 +104,45 @@ api.interceptors.request.use(
  * - 지출 기록 삭제 (ID로 삭제)
  */
 export const getExpenseRecordsList = (params : RequestExpenseRecordsList) => {
-  return api.get('records', { params });
+  return api.get('records/expense', { params });
 };
 export const getExpenseRecord = (id: number) => {
-  return api.get(`records/${id}`)
+  return api.get(`records/expense/${id}`)
 }
 export const createExpenseRecord = (storeId : number, record: ExpenseRecordFormRequest) => {
-  return api.post(`records?storeId=${storeId}`, record);
+  return api.post(`records/expense?storeId=${storeId}`, record);
 };
-export const updateSalesRecord = (id: number, record: ExpenseRecordFormRequest) => {
-  return api.put(`records/${id}`, record)
+export const updateExpenseRecord = (id: number, record: ExpenseRecordFormRequest) => {
+  return api.put(`records/expense/${id}`, record)
 }
 export const deleteExpenseRecord = (id: number) => {
-  return api.delete(`records/${id}`)
+  return api.delete(`records/expense/${id}`)
+}
+
+/**
+ * 매출 기록 관리 API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 매출 기록 목록 조회 (필터 조건 가능)
+ * - 특정 매출 기록 상세 조회 (ID로 조회)
+ * - 새로운 매출 기록 생성 (지정한 매장에 기록 추가)
+ * - 기존 매출 기록 수정 (ID로 수정)
+ * - 매출 기록 삭제 (ID로 삭제)
+ */
+export const getSaledRecordsList = (params : RequestExpenseRecordsList) => {
+  return api.get('records/sales', { params });
+};
+export const getSalesRecord = (id: number) => {
+  return api.get(`records/sales/${id}`)
+}
+export const createSalesRecord = (storeId : number, record: SalesRecordFormRequest) => {
+  return api.post(`records/sales?storeId=${storeId}`, record);
+};
+export const updateSalesRecord = (id: number, record: SalesRecordFormRequest) => {
+  return api.put(`records/sales/${id}`, record)
+}
+export const deleteSalesRecord = (id: number) => {
+  return api.delete(`records/sales/${id}`)
 }
 
 /**

@@ -7,11 +7,10 @@ import ExpenseRecordForm from '../components/ExpenseRecordForm';
 // 테이블의 열 이름
 const expenseColumns = [
   { key: "no", label: "No.", width: "8%" },
-  { key: "date", label: "날짜", width: "15%" },
-  { key: "amount", label: "총 매출", width: "15%" },
-  { key: "paymentKo", label: "홀 매출", width: "15%" },
-  { key: "detailKo", label: "배달 매출", width: "15%" },
-  { key: "paymentKo", label: "포장 매출", width: "15%" },
+  { key: "date", label: "날짜", width: "18%" },
+  { key: "amount", label: "금액", width: "18%" },
+  { key: "detailKo", label: "상세", width: "18%" },
+  { key: "paymentKo", label: "결제 수단", width: "18%" },
   { key: "etc", label: "비고", width: "auto" },
 ];
 

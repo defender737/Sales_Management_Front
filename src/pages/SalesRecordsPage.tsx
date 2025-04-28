@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import Record from '../components/Records'
 import { getExpenseRecordsList } from '../api/api';
 import {ResponseExpenseRecord, RequestExpenseRecordsList} from '../types/types';
-import ExpenseRecordForm from '../components/ExpenseRecordForm';
+import SalesRecordForm from '../components/SalesRecordForm';
 
 // 테이블의 열 이름
 const expenseColumns = [
@@ -17,15 +16,13 @@ const expenseColumns = [
 
 
 export default function ExpenseRecordsPage() {
-  const [paymentValue, setPaymentValue] = useState('all');
-
   return (
     <Record<ResponseExpenseRecord, RequestExpenseRecordsList> // T : 레코드 Response 타입, F : 레코드리스트 Request 타입
       pageTitle={{ title: '매출 기록', subTitle: '매출 내역을 기록하고 조회합니다.' }} // 페이지 제목
       columns={expenseColumns} // Table의 열 이름
       requestApi={getExpenseRecordsList} // 레코드 리스트 Request API
       renderForm={(mode, rowId, close) => (
-        <ExpenseRecordForm mode={mode} rowId={rowId} handleSubbmitAndClose={close} />
+        <SalesRecordForm mode={mode} rowId={rowId} handleSubbmitAndClose={close} />
       )}
     />
   );

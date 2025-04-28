@@ -74,7 +74,7 @@ export default function Records<T extends { id: number }, F>({
                 storeId: selectedStoreId,
                 page: page - 1,
                 size: 10,
-                order: sortOrder,
+                sortOrder: sortOrder,
                 startDate,
                 endDate};
             const finalFilter = mergeFilterParams ? mergeFilterParams(baseFilter) : baseFilter;

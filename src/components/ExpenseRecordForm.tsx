@@ -12,7 +12,7 @@ import {
   InputAdornment,
   CircularProgress,
 } from '@mui/material';
-import { createExpenseRecord, getExpenseRecord, updateSalesRecord, deleteExpenseRecord } from '../api/api'
+import { createExpenseRecord, getExpenseRecord, updateExpenseRecord, deleteExpenseRecord } from '../api/api'
 import { ExpenseRecordFormRequest } from '../types/types'
 import { SnackbarContext } from '../contexts/SnackbarContext';
 import { useSelectedStore } from '../stores/useSelectedStore'
@@ -68,7 +68,7 @@ export default function ExpenseRecordForm({ mode, handleSubbmitAndClose, rowId }
 
   const { request: updateRequest, loading: updateLoading, success: updateSuccess} =
     useApiRequest(
-      (rowId: number, form: ExpenseRecordFormRequest) => updateSalesRecord(rowId, form),
+      (rowId: number, form: ExpenseRecordFormRequest) => updateExpenseRecord(rowId, form),
       () => {
         showSnackbar("기록을 수정했습니다.", "success");
         setTimeout(() => handleSubbmitAndClose(), 1500);
