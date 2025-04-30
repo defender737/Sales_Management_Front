@@ -27,12 +27,12 @@ interface RecordFormProps {
 
 
 const salesFields = [
-  { name: 'baemin', label: '배민' },
+  { name: 'baemin', label: '배달의 민족' },
   { name: 'baemin1', label: '배민1' },
   { name: 'coupangEats', label: '쿠팡이츠' },
   { name: 'yogiyo', label: '요기요' },
   { name: 'ddangyo', label: '땡겨요' },
-  { name: 'brandDelivery', label: '브랜드 자체 배달' },
+  { name: 'brand', label: '브랜드 자체 배달' },
   { name: 'takeout', label: '포장 매출' },
   { name: 'hall', label: '홀 매출' },
 ] as const;
@@ -48,7 +48,7 @@ export default function SalesRecordForm({ mode, handleSubbmitAndClose, rowId }: 
       coupangEats: 0,
       yogiyo: 0,
       ddangyo: 0,
-      brandDelivery: 0,
+      brand: 0,
       takeout: 0,
       hall: 0,
       date: new Date().toISOString().split('T')[0],
@@ -98,8 +98,8 @@ export default function SalesRecordForm({ mode, handleSubbmitAndClose, rowId }: 
           baemin1: response.data.baemin1,
           coupangEats: response.data.coupangEats,
           yogiyo: response.data.yogiyo,
-          ddangyo: response.data.ttaenggeoyo,
-          brandDelivery: response.data.brandDelivery,
+          ddangyo: response.data.ddangyo,
+          brand: response.data.brand,
           takeout: response.data.takeout,
           hall: response.data.hall,
           date: response.data.date,
@@ -117,13 +117,13 @@ export default function SalesRecordForm({ mode, handleSubbmitAndClose, rowId }: 
 
   const onCreate = (data: SalesRecordFormRequest) => {
     if (!selectedStoreId) return showSnackbar("매장 정보를 찾을 수 없습니다.", "error");
-    const payload = { ...data, totalSales };
+    const payload = { ...data, total : totalSales, totalDelivery : totalDeliverySales };
     createRequest(selectedStoreId, payload);
   };
 
   const onUpdate = (data: SalesRecordFormRequest) => {
     if (!rowId) return showSnackbar("기록 정보를 찾을 수 없습니다.", "error");
-    const payload = { ...data, totalSales };
+    const payload = { ...data, total : totalSales, totalDelivery : totalDeliverySales };
     updateRequest(rowId, payload);
   };
 
@@ -132,7 +132,9 @@ export default function SalesRecordForm({ mode, handleSubbmitAndClose, rowId }: 
     deleteRequest(rowId);
   };
 
-  const totalSales = watch(['baemin', 'baemin1', 'coupangEats', 'yogiyo', 'ddangyo', 'brandDelivery', 'takeout', 'hall'])
+  const totalSales = watch(['baemin', 'baemin1', 'coupangEats', 'yogiyo', 'ddangyo', 'brand', 'takeout', 'hall'])
+    .reduce((acc, cur) => acc + (Number(cur) || 0), 0);
+  const totalDeliverySales =  watch(['baemin', 'baemin1', 'coupangEats', 'yogiyo', 'ddangyo', 'brand'])
     .reduce((acc, cur) => acc + (Number(cur) || 0), 0);
 
   return (
@@ -188,10 +190,7 @@ export default function SalesRecordForm({ mode, handleSubbmitAndClose, rowId }: 
       </Box>
       <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle1" fontWeight={600}>
-          배달 총 매출: {utils.formatNumberWithCommas(
-            watch(['baemin', 'baemin1', 'coupangEats', 'yogiyo', 'ddangyo', 'brandDelivery'])
-              .reduce((acc, cur) => acc + (Number(cur) || 0), 0)
-          )}원
+          배달 총 매출: {utils.formatNumberWithCommas(totalDeliverySales)}원
         </Typography>
       </Box>
 

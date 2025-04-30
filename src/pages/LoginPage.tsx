@@ -65,8 +65,8 @@ export default function LoginPage() {
                         </Typography>
                     </Box>
                     <form onSubmit={handleSubmit(loginSubmit)}>
-                        <TextField {...register("email")} fullWidth margin="normal" label="이메일" variant="standard" />
-                        <TextField {...register("password")} fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
+                        <TextField {...register("email")} defaultValue={"er888@naver.com"} fullWidth margin="normal" label="이메일" variant="standard" />
+                        <TextField {...register("password")} defaultValue={"hesw020419"} fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
                         <FormControlLabel control={<Checkbox defaultChecked />} label="로그인 유지하기" />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
                             <Link href="#" variant="body2" underline='none'>

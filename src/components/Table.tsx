@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 
 interface TableProps<T> {
   data: T[]; // 테이블에 표시할 데이터
-  columns: { key: string, label: string, width : string }[]; // 테이블의 열 이름
+  columns: { key: string, label: string, width : string, unit?: string }[]; // 테이블의 열 이름
   keyExtractor: (item: T) => string | number; // 데이터의 키를 추출하는 함수
   onRowClick? : (id : number) => void;
 }
@@ -52,7 +52,7 @@ export default function BasicTable<T>({ data, columns, keyExtractor, onRowClick}
                     textOverflow : "ellipsis"
                   }}
                   >
-                    {String(row[column.key as keyof T])}
+                  {`${String(row[column.key as keyof T])}${column.unit ? ` ${column.unit}` : ''}`}
                   </TableCell>
                 ))}
               </TableRow>

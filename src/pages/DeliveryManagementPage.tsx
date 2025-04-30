@@ -63,8 +63,8 @@ export default function DeliveryManagementPage() {
       }}>
         <FormProvider {...methods}>
           <Box component={'form'} onSubmit={methods.handleSubmit(onSubmit)}>
-            <DeliveryCompanyCard name='beamin' nameKo="배달의 민족" image="/assets/img/icons/beamin.png" />
-            <DeliveryCompanyCard name='beamin1' nameKo="배민1" image="/assets/img/icons/beamin1.png" />
+            <DeliveryCompanyCard name='baemin' nameKo="배달의 민족" image="/assets/img/icons/beamin.png" />
+            <DeliveryCompanyCard name='baemin1' nameKo="배민1" image="/assets/img/icons/beamin1.png" />
             <DeliveryCompanyCard name='yogiyo' nameKo="요기요" image='/assets/img/icons/yogiyo.png' />
             <DeliveryCompanyCard name='coupangEats' nameKo="쿠팡이츠" image='/assets/img/icons/coupangEats.png' />
             <DeliveryCompanyCard name='ddangyo' nameKo="땡겨요" image='/assets/img/icons/ddangyo.png' />

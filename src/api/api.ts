@@ -6,7 +6,8 @@ import {
   ExpenseRecordFormRequest,
   RequestExpenseRecordsList,
   DeliveryPlatform,
-  SalesRecordFormRequest
+  SalesRecordFormRequest,
+  RequestSalesRecordsList
 } from '../types/types'
 import { setAccessToken, getAccessToken } from '../stores/useAuthStore'
 
@@ -129,7 +130,7 @@ export const deleteExpenseRecord = (id: number) => {
  * - 기존 매출 기록 수정 (ID로 수정)
  * - 매출 기록 삭제 (ID로 삭제)
  */
-export const getSaledRecordsList = (params : RequestExpenseRecordsList) => {
+export const getSalesRecordsList = (params : RequestSalesRecordsList) => {
   return api.get('records/sales', { params });
 };
 export const getSalesRecord = (id: number) => {
@@ -259,8 +260,16 @@ export const withdraw = () => {
  * - 배달 플랫폼 별 수수료율, 사용 여부 수정
  */
 export const getDelveryPlatformInfo = (storeId : number) => {
-  return api.get(`/deliveryPlatform/${storeId}`);
+  return api.get(`/deliveryCommission/${storeId}`);
 }
 export const updateDelveryPlatformInfo = (storeId : number, data : DeliveryPlatform) => {
-  return api.put(`/deliveryPlatform/${storeId}`, data);
+  return api.put(`/deliveryCommission/${storeId}`, data);
+}
+
+export const getSalesExpenseStats = (storeId: number, year: string, isExcludeDeliveryFee : boolean) => {
+  return api.get(`/summary/salesExpense/monthly?storeId=${storeId}&year=${year}&excludeDeliveryFee=${isExcludeDeliveryFee}`);
+}
+
+export const getSalesTypeStats = (storeId: number, year: string, isExcludeDeliveryFee : boolean) => {
+  return api.get(`/summary/salesType/monthly?storeId=${storeId}&year=${year}&excludeDeliveryFee=${isExcludeDeliveryFee}`);
 }

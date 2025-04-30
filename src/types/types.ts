@@ -31,25 +31,38 @@ export type ResponseExpenseRecord = {
 // 지출 기록 생성 및 수정 RequestType
 export type ExpenseRecordFormRequest = Omit<ResponseExpenseRecord, 'id' | 'no' | 'detailKo' | 'paymentKo'>;
 
+// 지출 기록 RequestType
+export type RequestSalesRecordsList = {
+  storeId: number,
+  page: number,
+  size: number,
+  sortOrder: string,
+  startDate?: string,
+  endDate?: string
+}
+
 // 매출 기록 ResponseType
 export type ResponseSalesRecord = {
   no?: number;
   id: number;
   date: string;
   totalAmount: number;
-  HallAmount: number;
+  hallAmount: number;
   takeoutAmount: number;
   deliveryAmount: number;
   totalCommission: number;
+  etc: string;
 }
 
 export type SalesRecordFormRequest = {
+  total?: number;
+  totalDelivery?: number;
   baemin: number;
   baemin1: number;
   coupangEats: number;
   yogiyo: number;
   ddangyo: number;
-  brandDelivery: number;
+  brand: number;
   takeout: number;
   hall: number;
   date: string;
@@ -98,14 +111,8 @@ export type storeForm = Omit<Store, 'id'>;
 
 // 배달 관리 정보
 export type DeliveryPlatform = {
-  beaminEnabled: boolean;
-  beamin1Enabled: boolean;
-  yogiyoEnabled: boolean;
-  coupangEatsEnabled: boolean;
-  ddangyoEnabled: boolean;
-  brandEnabled: boolean;
-  beaminCommissionRate: number;
-  beamin1CommissionRate: number;
+  baeminCommissionRate: number;
+  baemin1CommissionRate: number;
   yogiyoCommissionRate: number;
   coupangEatsCommissionRate: number;
   ddangyoCommissionRate: number;

@@ -52,7 +52,7 @@ export default function DeliveryCompanyCard({ name, image, nameKo}: DeliveryComp
                     )}
                 />
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography>서비스 사용 여부: </Typography>
                 <Controller
                     name={`${name}Enabled`}
@@ -61,7 +61,7 @@ export default function DeliveryCompanyCard({ name, image, nameKo}: DeliveryComp
                         <Checkbox checked={Boolean(field.value)} onChange={(e) => field.onChange(e.target.checked)} />
                     )}
                 />
-            </Box>
+            </Box> */}
         </Box>
 
 
