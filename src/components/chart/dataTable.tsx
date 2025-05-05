@@ -9,12 +9,12 @@ interface DataTableProps {
 export default function DataTable({ headers, rows, tableRow }: DataTableProps) {
     return (
         <TableContainer component={Paper} sx={{ overflowX: 'auto' }} >
-            <Table sx={{ tableLayout: 'fixed', width: '100%', minWidth: 1600 }}>
+            <Table sx={{ tableLayout: 'auto', width: '100%', minWidth: 1600 }}>
                 <TableHead>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>구분</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold', minWidth : 120 }}>구분</TableCell>
                         {headers.map((header, idx) => (
-                            <TableCell key={idx} align="center" sx={{ fontWeight: 'bold' }}>{header}</TableCell>
+                            <TableCell key={idx} align="center" sx={{ fontWeight: 'bold', minWidth : 100 }}>{header}</TableCell>
                         ))}
                     </TableRow>
                 </TableHead>
@@ -41,7 +41,7 @@ export default function DataTable({ headers, rows, tableRow }: DataTableProps) {
                             <TableRow sx={{ backgroundColor: '#f0f0f0' }}>
                                 <TableCell sx={{ fontWeight: 'bold' }}>순수익</TableCell>
                                 {headers.map((_, i) => {
-                                    const income = rows.find(row => row.label === '수익')?.data[i] || 0;
+                                    const income = rows.find(row => row.label === '매출')?.data[i] || 0;
                                     const expenses = rows.find(row => row.label === '지출')?.data[i] || 0;
                                     return (
                                         i === headers.length - 1 ? (

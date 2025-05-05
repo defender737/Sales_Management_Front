@@ -9,19 +9,23 @@ import {
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-interface DoughnutChartProps {
-  labels: string[];
-  data: number[];
-  backgroundColors: string[];
+interface DoughnutDataItem {
+  label: string;
+  value: number;
+  color: string;
 }
 
-const DoughnutChart: React.FC<DoughnutChartProps> = ({ labels, data, backgroundColors }) => {
+interface DoughnutChartProps {
+  dataItems: DoughnutDataItem[];
+}
+
+const DoughnutChart: React.FC<DoughnutChartProps> = ({ dataItems }) => {
   const chartData = {
-    labels,
+    labels: dataItems.map((item) => item.label),
     datasets: [
       {
-        data,
-        backgroundColor: backgroundColors,
+        data: dataItems.map((item) => item.value),
+        backgroundColor: dataItems.map((item) => item.color),
         borderWidth: 1,
       },
     ],

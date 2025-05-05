@@ -266,10 +266,38 @@ export const updateDelveryPlatformInfo = (storeId : number, data : DeliveryPlatf
   return api.put(`/deliveryCommission/${storeId}`, data);
 }
 
-export const getSalesExpenseStats = (storeId: number, year: string, isExcludeDeliveryFee : boolean) => {
-  return api.get(`/summary/salesExpense/monthly?storeId=${storeId}&year=${year}&excludeDeliveryFee=${isExcludeDeliveryFee}`);
+export const getSalesExpenseStatsMonthly = (storeId: number, year: string, isExcludeDeliveryCommission : boolean) => {
+  return api.get(`/summary/salesExpense/monthly?storeId=${storeId}&year=${year}&excludeDeliveryCommission=${isExcludeDeliveryCommission}`);
 }
 
-export const getSalesTypeStats = (storeId: number, year: string, isExcludeDeliveryFee : boolean) => {
-  return api.get(`/summary/salesType/monthly?storeId=${storeId}&year=${year}&excludeDeliveryFee=${isExcludeDeliveryFee}`);
+export const getSalesExpenseStatsDaily = (storeId: number, year: string, month : string, isExcludeDeliveryCommission : boolean) => {
+  return api.get(`/summary/salesExpense/daily?storeId=${storeId}&year=${year}&month=${month}&excludeDeliveryCommission=${isExcludeDeliveryCommission}`);
 }
+
+export const getSalesTypeStatsMonthly = (storeId: number, year: string, isExcludeDeliveryCommission : boolean) => {
+  return api.get(`/summary/salesType/monthly?storeId=${storeId}&year=${year}&excludeDeliveryCommission=${isExcludeDeliveryCommission}`);
+}
+
+export const getSalesTypeStatsDaily = (storeId: number, year: string, month: string, isExcludeDeliveryCommission : boolean) => {
+  return api.get(`/summary/salesType/daily?storeId=${storeId}&year=${year}&month=${month}&excludeDeliveryCommission=${isExcludeDeliveryCommission}`);
+}
+
+export const getSalesTypeStatsByDeliveryPlatformMonthly = (storeId: number, year: string, isExcludeDeliveryCommission : boolean) => {
+  return api.get(`/summary/deliveryPlatform/monthly?storeId=${storeId}&year=${year}&excludeDeliveryCommission=${isExcludeDeliveryCommission}`);
+}
+export const getSalesTypeStatsByDeliveryPlatformDaily = (storeId: number, year: string, month : string, isExcludeDeliveryCommission : boolean) => {
+  return api.get(`/summary/deliveryPlatform/daily?storeId=${storeId}&year=${year}&month=${month}&excludeDeliveryCommission=${isExcludeDeliveryCommission}`);
+}
+
+export const getTotalFinancialSummaryYearly = (storeId: number, year : string) => {
+  return api.get(`/summary/total/yearly?storeId=${storeId}&year=${year}`);
+}
+
+export const getTotalFinancialSummaryMonthly = (storeId: number, year : string, month : string) => {
+  return api.get(`/summary/total/monthly?storeId=${storeId}&year=${year}&month=${month}`);
+}
+
+export const getFirstYear = (storeId : number) => {
+  return api.get(`/summary/firstYear?storeId=${storeId}`)
+}
+

@@ -11,8 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { SelectChangeEvent } from '@mui/material/Select';
 import SearchIcon from '@mui/icons-material/Search';
 import { utils } from '../utils/util'
-
-
+import Toggle from '../components/Toggle'
 
 const selectOptions = [
     { value: 'desc', label: '최신순' },
@@ -177,21 +176,14 @@ export default function Records<T extends { id: number }, F>({
                 <Box sx={{ mt: 3, ml: 1 }}>
                     <Box sx={{ mb: 2, display: "flex", justifyContent: "space-between", alignItems: "center", mr: 1 }}>
                         <Box display="flex" sx={{ alignItems: "center" }}>
-                            <ToggleButtonGroup
-                                color='primary'
-                                value={toggleValue}
-                                exclusive
-                                onChange={handleToggleChange}
-                                aria-label="text alignment"
-                                sx={{ mr: 3, display: "grid", gridAutoColumns: "1fr", gridAutoFlow: "column", }}
-                            >
-                                <ToggleButton value={"all"} aria-label="left aligned">전체</ToggleButton>
-                                <ToggleButton value={"oneMonth"} aria-label="centered">1 개월</ToggleButton>
-                                <ToggleButton value={"threeMonth"} aria-label="right aligned">3 개월</ToggleButton>
-                                <ToggleButton value={"selfInput"} aria-label="right aligned">직접 입력</ToggleButton>
-                            </ToggleButtonGroup>
+                            <Toggle value={toggleValue} onChange={handleToggleChange} buttons={[
+                                {label : "전체", value : "all"},
+                                {label : "1 개월", value : "oneMonth"},
+                                {label : "3 개월", value : "threeMonth"},
+                                {label : "직접 입력", value : "selfInput"},
+                            ]} />
                             <Collapse in={toggleValue === "selfInput"} orientation="horizontal">
-                                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", pt: 1, pb: 1 }}>
+                                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", pt: 1, pb: 1, ml: 3 }}>
                                     <TextField id="startDate" InputLabelProps={{ shrink: true }} label="시작일" type="date" defaultValue={utils.getOneMonthAgoDate()} sx={{ mr: 2 }} />
                                     <TextField id="endDate" InputLabelProps={{ shrink: true }} label="종료일" type="date" defaultValue={utils.getTodayDate()} />
 

@@ -5,76 +5,94 @@ import BarChart from '../../components/chart/BarChart';
 import LineChart from '../../components/chart/LineChart';
 import DataTable from '../../components/chart/dataTable';
 import { useApiRequest } from '../../hooks/useApiRequest';
-import { getSalesExpenseStats } from '../../api/api';
+import { getSalesExpenseStatsMonthly, getSalesExpenseStatsDaily } from '../../api/api';
 import { useSelectedStore } from '../../stores/useSelectedStore';
 import { SnackbarContext } from '../../contexts/SnackbarContext';
 
 interface SalesExpenseStats {
     year: string;
-    isExcludeDeliveryFee : boolean
+    isExcludeDeliveryCommission : boolean;
+    month : string;
+    viewMode : string;
+}
+const chartColor = {
+    income : 'rgba(54, 162, 235, 0.8)',
+    expense : 'rgba(255, 99, 132, 0.8)'
 }
 
-const blue = 'rgba(54, 162, 235, 0.8)';
-const red = 'rgba(255, 99, 132, 0.8)'
-
-export default function SalesExpenseStatsTab({ year, isExcludeDeliveryFee }: SalesExpenseStats) {
+export default function SalesExpenseStatsTab({ year, month, isExcludeDeliveryCommission, viewMode }: SalesExpenseStats) {
     const { selectedStoreId } = useSelectedStore(); 
     const showSnackbar = useContext(SnackbarContext);
-    const [income, setIncome] = useState<number[]>([]);
-    const [expenses, setExpenses] = useState<number[]>([]);
-    const [incomeWidthoutTotal, setincomeWidthoutTotal] = useState<number[]>([]);
-    const [expensesWidthoutTotal, setExpensesWidthoutTotal] = useState<number[]>([]);
-    const [labels, setLabels] = useState<string[]>([]); 
-    const [tableLabels, setTableLabels] = useState<string[]>([]);
+    const [summaryData, setSummaryData] = useState<{
+        labels: string[]; // 1월, 2월, 3월 ...
+        income: number[]; // 매출
+        expense: number[]; // 지출
+        tableLabels: string[]; // 테이블의 labels 1월, 2월, 3월 ... 총계
+        incomeWithTotal: number[]; 
+        expenseWithTotal: number[];
+    }>({
+        labels: [],
+        income: [],
+        expense: [],
+        tableLabels: [],
+        incomeWithTotal: [],
+        expenseWithTotal: [],
+    });
 
-    const { request, loading } = useApiRequest(
-        (storeId: number, year: string, isExcludeDeliveryFee : boolean) => getSalesExpenseStats(storeId, year, isExcludeDeliveryFee),
+    const transformData = (salesMap: any, expenseMap: any) => {
+        const labels = Object.keys(salesMap); // 1월, 2월...
+        const withTotal = labels.map((label) => ({
+            label,
+            income: salesMap[label] ?? 0,
+            expense: expenseMap[label] ?? 0,
+        }));
+        const withoutTotal = withTotal.filter((d) => d.label !== "총계");
+
+        return {
+            labels: withoutTotal.map((d) => d.label),
+            income: withoutTotal.map((d) => d.income),
+            expense: withoutTotal.map((d) => d.expense),
+            incomeWithTotal: withTotal.map((d) => d.income),
+            expenseWithTotal: withTotal.map((d) => d.expense),
+            tableLabels: withTotal.map((d) => d.label),
+        };
+    };
+
+    const { request } = useApiRequest(
+        (storeId: number, year: string, month : string, isExcludeDeliveryCommission : boolean) => 
+        viewMode === 'monthly' ?
+            getSalesExpenseStatsMonthly(storeId, year, isExcludeDeliveryCommission)
+        :
+            getSalesExpenseStatsDaily(storeId, year, month, isExcludeDeliveryCommission)
+        ,
         (response) => {
             console.log(response.data)
-            const salesMap = response.data.salesSummaryMap || {};
-            const expenseMap = response.data.expenseSummaryMap || {};
-
-            const allLabels = Object.keys(salesMap);
-
-            const dataWithTotal = allLabels.map(label => ({
-                label,
-                income: salesMap[label] ?? 0,
-                expense: expenseMap[label] ?? 0
-            }));
-
-            const dataWithoutTotal = dataWithTotal.filter(item => item.label !== '총계');
-
-   
-            setLabels(dataWithoutTotal.map(item => item.label));
-            setIncome(dataWithoutTotal.map(item => item.income));
-            setExpenses(dataWithoutTotal.map(item => item.expense));
-
-            setincomeWidthoutTotal(dataWithTotal.map(item => item.income));
-            setExpensesWidthoutTotal(dataWithTotal.map(item => item.expense));
-            setTableLabels(dataWithTotal.map(item => item.label));
+            const salesMap = response.data.salesSummary || {};
+            const expenseMap = response.data.expenseSummary || {};
+            setSummaryData(transformData(salesMap, expenseMap));
         },
         (msg) => showSnackbar(msg, "error"),
     );
 
     const dataSetsForBarChart = [
-        { label: '매출', data: income, backgroundColor: blue },
-        { label: '지출', data: expenses, backgroundColor: red },
+        { label: '매출', data: summaryData.income, backgroundColor: chartColor.income },
+        { label: '지출', data: summaryData.expense, backgroundColor: chartColor.expense },
     ];
 
     const dataSetsForLineChart = [
-        { label: '매출', data: income, borderColor: blue },
-        { label: '지출', data: expenses, borderColor: red },
+        { label: '매출', data: summaryData.income, borderColor: chartColor.income },
+        { label: '지출', data: summaryData.expense, borderColor: chartColor.expense },
     ];
 
     const TabledataSets = [
-        { label: '매출', data: incomeWidthoutTotal, borderColor: blue },
-        { label: '지출', data: expensesWidthoutTotal, borderColor: red },
+        { label: '매출', data: summaryData.incomeWithTotal },
+        { label: '지출', data: summaryData.expenseWithTotal },
     ];
 
     useEffect(() => {
         if (!selectedStoreId) return showSnackbar("메장 정보를 찾을 수 없습니다.", "error");
-        request(selectedStoreId, year, isExcludeDeliveryFee);
-    }, [selectedStoreId, year, isExcludeDeliveryFee]);
+        request(selectedStoreId, year, month, isExcludeDeliveryCommission);
+    }, [selectedStoreId, year, month, isExcludeDeliveryCommission, viewMode]);
     return (
         <>
             <Grid container spacing={2} mb={3}>
@@ -82,7 +100,7 @@ export default function SalesExpenseStatsTab({ year, isExcludeDeliveryFee }: Sal
                     <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
                         <Typography variant="h6" gutterBottom>연간 매출/지출 현황</Typography>
                         <Box sx={{ width: '100%', minHeight: 300, maxHeight: '100%' }} >
-                            <BarChart labels={labels} datasets={dataSetsForBarChart} />
+                            <BarChart labels={summaryData.labels} datasets={dataSetsForBarChart} />
                         </Box>
                     </Paper>
                 </Grid>
@@ -90,7 +108,7 @@ export default function SalesExpenseStatsTab({ year, isExcludeDeliveryFee }: Sal
                     <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
                         <Typography variant="h6" gutterBottom>연간 매출/지출 변동</Typography>
                         <Box sx={{ width: '100%', minHeight: 300, maxHeight: '100%' }}>
-                            <LineChart labels={labels} dataSets={dataSetsForLineChart} />
+                            <LineChart labels={summaryData.labels} dataSets={dataSetsForLineChart} />
                         </Box>
                     </Paper>
                 </Grid>
@@ -100,7 +118,7 @@ export default function SalesExpenseStatsTab({ year, isExcludeDeliveryFee }: Sal
                     <Paper elevation={3} sx={{ p: 3 }}>
                         <Typography variant="h6" gutterBottom>월별 매출/지출 상세</Typography>
                         <Box>
-                            <DataTable headers={tableLabels} rows={TabledataSets} tableRow='netProfit' />
+                            <DataTable headers={summaryData.tableLabels} rows={TabledataSets} tableRow='netProfit' />
                         </Box>
                     </Paper>
                 </Grid>
