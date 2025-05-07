@@ -1,6 +1,5 @@
-import { useState, useEffect, useContext } from 'react';
-import axios from 'axios'
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import IconButton from '@mui/material/IconButton';
@@ -49,12 +48,14 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { selectedStoreId, setSelectedStoreId } = useSelectedStore();
   const { user, setUser, setAccessToken } = useAuthStore();
+  const navigate = useNavigate();
   const { request: logouRequest } = useApiRequest(
     () => logout(),
     () => {
       setUser(null);
       setAccessToken(null);
       setSelectedStoreId(null);
+      navigate('/login');
     },
     (msg) => alert(msg)
   )

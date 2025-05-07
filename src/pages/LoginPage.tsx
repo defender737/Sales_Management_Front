@@ -6,18 +6,23 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useApiRequest } from '../hooks/useApiRequest';
 import { useFetchCurrentUser } from '../hooks/useFetchCurrentUser';
-
+import { useState, useRef } from 'react';
 interface LoginForm {
     email: string;
     password: string;
 }
 
 export default function LoginPage() {
-
+    const [isEmailRemember, setIsEmailRemember] = useState(true);
     const { setAccessToken } = useAuthStore();
     const {fetchCurrentUser} = useFetchCurrentUser();
+    const emailRef = useRef(''); 
 
-    const { register, handleSubmit } = useForm<LoginForm>();
+    const { register, handleSubmit } = useForm<LoginForm>({
+      defaultValues: {
+        email: localStorage.getItem('loginEmail') || '',
+      },
+    });
     const navigate = useNavigate();
 
     const { request: loginRequest, loading: loginLoading } =
@@ -27,12 +32,18 @@ export default function LoginPage() {
                 const accessToken = response.data.accessToken;
                 setAccessToken(accessToken);
                 fetchCurrentUser();
+                if (isEmailRemember) {
+                    localStorage.setItem('loginEmail', emailRef.current);
+                } else {
+                    localStorage.removeItem('loginEmail');
+                }
                 navigate('/sales-expenses');
             },
             (msg) => alert(msg),
             {delay : true}
         )
     const loginSubmit = (data: LoginForm) => {
+        emailRef.current = data.email
         loginRequest(data);
     }
     return (
@@ -65,11 +76,11 @@ export default function LoginPage() {
                         </Typography>
                     </Box>
                     <form onSubmit={handleSubmit(loginSubmit)}>
-                        <TextField {...register("email")} defaultValue={"er888@naver.com"} fullWidth margin="normal" label="이메일" variant="standard" />
-                        <TextField {...register("password")} defaultValue={"hesw020419"} fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
-                        <FormControlLabel control={<Checkbox defaultChecked />} label="로그인 유지하기" />
+                        <TextField {...register("email")} fullWidth margin="normal" label="이메일" variant="standard" />
+                        <TextField {...register("password")} fullWidth margin="normal" label="비밀번호" type="password" variant="standard" />
+                        <FormControlLabel control={<Checkbox checked={isEmailRemember} onChange={() => setIsEmailRemember(!isEmailRemember)}/>} label="이메일 기억하기" />
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                            <Link href="#" variant="body2" underline='none'>
+                            <Link href="/findPassword" variant="body2" underline='none'>
                                 비밀번호 찾기
                             </Link>
                         </Box>

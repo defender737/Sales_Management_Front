@@ -118,3 +118,14 @@ export type DeliveryPlatform = {
   ddangyoCommissionRate: number;
   brandCommissionRate: number;
 }
+
+export type helpRequest = {
+  email : string,
+  title : string,
+  content : string,
+}
+
+export type resetPasswordRequest = {
+  email : string,
+  newPassword : string
+}

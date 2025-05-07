@@ -1,5 +1,4 @@
 import { useState, useContext, useEffect } from 'react';
-import { styled } from '@mui/material/styles';
 import { Box, Paper, Typography, FormControl, Select, MenuItem, InputLabel, Tabs, Tab, Switch, FormControlLabel, Tooltip, ToggleButtonGroup, Collapse, toggleButtonGroupClasses } from '@mui/material';
 import Grid from '@mui/material/Grid2'
 import PageTitle from '../components/PageTitle';
@@ -60,7 +59,7 @@ export default function Dashboard() {
     });
 
     useEffect(() => {
-        if (!selectedStoreId) return showSnackbar("메장 정보를 찾을 수 없습니다.", "error");
+        if (!selectedStoreId) return showSnackbar("매장 정보를 찾을 수 없습니다.", "error");
         firstYearRequest(selectedStoreId)
         FincancialSummaryRequest(selectedStoreId, year, month);
 

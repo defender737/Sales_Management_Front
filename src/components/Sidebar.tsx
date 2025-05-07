@@ -88,9 +88,7 @@ const menuItems1 = [
 ];
 
 const menuItems2 = [
-  { text: "보고서", icon: <ReceiptIcon />, path: "/" },
-  { text: "지원", icon: <HelpOutlineIcon />, path: "/" },
-  { text: "설정", icon: <SettingsIcon />, path: "/" }
+  { text: "지원", icon: <HelpOutlineIcon />, path: "/help" },
 ];
 
 // Sidebar 컴포넌트 정의

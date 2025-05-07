@@ -27,7 +27,7 @@ export function useAuthInitializer() {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const message = error.response?.data?.details;
-          if(currentPath !== '/login' && currentPath !== '/Login') alert(message);
+          if(currentPath.toLowerCase() !== '/login' && currentPath.toLowerCase() !== '/findpassword') alert(message);
           setAccessToken(null);
           setUser(null);
           console.warn('자동 로그인 실패');

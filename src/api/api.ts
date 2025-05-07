@@ -7,7 +7,9 @@ import {
   RequestExpenseRecordsList,
   DeliveryPlatform,
   SalesRecordFormRequest,
-  RequestSalesRecordsList
+  RequestSalesRecordsList,
+  helpRequest,
+  resetPasswordRequest
 } from '../types/types'
 import { setAccessToken, getAccessToken } from '../stores/useAuthStore'
 
@@ -157,6 +159,9 @@ export const deleteSalesRecord = (id: number) => {
 export const requestEmailVerification = (email: string) => {
   return api.post('auth/email/verify-request', { email })
 }
+export const requestEmailVerificationForPasswordReset = (email: string) => {
+  return api.post('auth/password/reset/email/verify-request', { email })
+}
 export const requestEmailCodeVerification = (email: string, code: string) => {
   return api.post('auth/email/verify-check', { email, code })
 }
@@ -300,4 +305,13 @@ export const getTotalFinancialSummaryMonthly = (storeId: number, year : string, 
 export const getFirstYear = (storeId : number) => {
   return api.get(`/summary/firstYear?storeId=${storeId}`)
 }
+
+export const sendHelp = (data : helpRequest) => {
+  return api.post('/help', data)
+}
+
+export const resetPassowrd = (data : resetPasswordRequest) => {
+  return api.patch('auth/password/reset', data)
+}
+
 

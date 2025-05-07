@@ -44,12 +44,12 @@ export default function DeliveryManagementPage() {
 
 
   const onSubmit = (data: any) => {
-    if (!selectedStoreId) return showSnackbar("메장 정보를 찾을 수 없습니다.", "error");
+    if (!selectedStoreId) return showSnackbar("매장 정보를 찾을 수 없습니다.", "error");
     updateRequest(selectedStoreId, data);
   };
 
   useEffect(() => {
-    if (!selectedStoreId) return showSnackbar("메장 정보를 찾을 수 없습니다.", "error");
+    if (!selectedStoreId) return showSnackbar("매장 정보를 찾을 수 없습니다.", "error");
     getRequest(selectedStoreId)
   }, [selectedStoreId]);
 

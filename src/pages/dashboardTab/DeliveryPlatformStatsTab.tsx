@@ -89,7 +89,7 @@ export default function DeliveryPlatformStatsTab({year, month, viewMode, isExclu
     );
 
     useEffect(() => {
-        if (!selectedStoreId) return showSnackbar("메장 정보를 찾을 수 없습니다.", "error");
+        if (!selectedStoreId) return showSnackbar("매장 정보를 찾을 수 없습니다.", "error");
         request(selectedStoreId, year, month, isExcludeDeliveryCommission);
     }, [selectedStoreId, year, month, isExcludeDeliveryCommission, viewMode]);
     

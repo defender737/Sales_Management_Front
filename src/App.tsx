@@ -12,6 +12,7 @@ import PublicOnlyRoute from './components/routingComponents/PublicOnlyRoute';
 import RedirectRoute from './components/routingComponents/RedirectRoute';
 import {useAuthInitializer} from './hooks/useAuthInitializer'
 import GlobalModals from './components/GlobalModals' 
+import FindPasswordPage from './pages/FindPasswordPage'
 
 
 export default function App() {
@@ -25,12 +26,12 @@ export default function App() {
             <GlobalModals />
               <Routes>
                 <Route path="/" element={<RedirectRoute />} />
-
-                <Route element={<PublicOnlyRoute />}>
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
-                </Route>
                 {/* <Route path="*" element={<NotFound />} /> */}
+                <Route element={<PublicOnlyRoute />}>
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/findPassword" element={<FindPasswordPage />} />
+                </Route>
                 <Route
                   path="/*"
                   element={

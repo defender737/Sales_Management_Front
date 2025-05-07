@@ -110,7 +110,7 @@ export default function ExpenseRecordForm({ mode, handleSubbmitAndClose, rowId }
   }, [isEdit, rowId]);
 
   const onCreate = (data: ExpenseRecordFormRequest) => {
-    if (!selectedStoreId) return showSnackbar("메장 정보를 찾을 수 없습니다.", "error");
+    if (!selectedStoreId) return showSnackbar("매장 정보를 찾을 수 없습니다.", "error");
     createRequest(selectedStoreId, data);
   };
 
