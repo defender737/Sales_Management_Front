@@ -13,8 +13,9 @@ import AddStoreButton from '@mui/icons-material/AddBusiness'
 import { useSelectedStore } from '../stores/useSelectedStore'
 import { logout } from '../api/api'
 import { useApiRequest } from '../hooks/useApiRequest'
+import theme from '../styles/Theme';
 
-const drawerWidth = 240;
+const drawerWidth = theme.custom.drawerWidth;
 
 interface HeaderProps {
   open: boolean;

@@ -26,7 +26,7 @@ export default function MainContent() {
   }
 
   return (
-    <Box component="main" sx={{ flexGrow: 1, p: 5, bgcolor: "white", minWidth: 0 }}>
+    <Box component="main" sx={{ flexGrow: 1, p: 5, minWidth: 0 }}>
       <Toolbar />
       <Routes>
         <Route element={<PrivateRoute />}>
@@ -39,7 +39,7 @@ export default function MainContent() {
           <Route path="/salesRecord" element={isStoreExist ? <SalesRecordsPage /> : <NoStorePromptPage />} />
           <Route path="/expenseRecord" element={isStoreExist ? <ExpenseRecordsPage /> : <NoStorePromptPage />} />
           <Route path="/deliveryManagement" element={isStoreExist ? <DeliveryManagementPage /> : <NoStorePromptPage />} />
-          <Route path="/help" element={isStoreExist ? <HelpPage /> : <NoStorePromptPage />} />
+          <Route path="/help" element={<HelpPage />} />
         </Route>
       </Routes>
     </Box>

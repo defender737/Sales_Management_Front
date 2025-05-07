@@ -9,7 +9,7 @@ import Grid from '@mui/material/Grid2'
 import BarChart from '../../components/chart/BarChart';
 import LineChart from '../../components/chart/LineChart';
 import DoughnutChart from '../../components/chart/DoughnutChart';
-import DataTable from '../../components/chart/dataTable';
+import DataTable from '../../components/chart/DataTable';
 
 interface SalesTypeStatsTab {
     year: string;

@@ -1,27 +1,29 @@
-// src/api/api.ts
 import axios from 'axios';
 import { 
-  registerForm,
   storeForm,
-  ExpenseRecordFormRequest,
-  RequestExpenseRecordsList,
+  helpRequest,
+  registerForm,
   DeliveryPlatform,
+  resetPasswordRequest,
   SalesRecordFormRequest,
   RequestSalesRecordsList,
-  helpRequest,
-  resetPasswordRequest
-} from '../types/types'
-import { setAccessToken, getAccessToken } from '../stores/useAuthStore'
+  ExpenseRecordFormRequest,
+  RequestExpenseRecordsList
+} from '../types/types';
+
+import { setAccessToken, getAccessToken } from '../stores/useAuthStore';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/',  // 기본 URL 설정
+  baseURL: process.env.REACT_APP_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true, // 쿠키를 포함하여 요청
 });
+
 let isRefreshing = false;
 let failedQueue: any[] = [];
+
 const processQueue = (error: any, token: string | null = null) => {
   failedQueue.forEach((prom: any) => {
     if (error) {
@@ -83,6 +85,7 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
@@ -100,11 +103,11 @@ api.interceptors.request.use(
  * 지출 기록 관리 API
  * 
  * 아래 기능들을 제공합니다:
- * - 지출 기록 목록 조회 (필터 조건 가능)
- * - 특정 지출 기록 상세 조회 (ID로 조회)
- * - 새로운 지출 기록 생성 (지정한 매장에 기록 추가)
- * - 기존 지출 기록 수정 (ID로 수정)
- * - 지출 기록 삭제 (ID로 삭제)
+ * - 지출 기록 목록 조회
+ * - 특정 지출 기록 상세 조회
+ * - 새로운 지출 기록 생성
+ * - 기존 지출 기록 수정
+ * - 지출 기록 삭제
  */
 export const getExpenseRecordsList = (params : RequestExpenseRecordsList) => {
   return api.get('records/expense', { params });
@@ -126,11 +129,11 @@ export const deleteExpenseRecord = (id: number) => {
  * 매출 기록 관리 API
  * 
  * 아래 기능들을 제공합니다:
- * - 매출 기록 목록 조회 (필터 조건 가능)
- * - 특정 매출 기록 상세 조회 (ID로 조회)
- * - 새로운 매출 기록 생성 (지정한 매장에 기록 추가)
- * - 기존 매출 기록 수정 (ID로 수정)
- * - 매출 기록 삭제 (ID로 삭제)
+ * - 매출 기록 목록 조회
+ * - 특정 매출 기록 상세 조회
+ * - 새로운 매출 기록 생성
+ * - 기존 매출 기록 수정
+ * - 매출 기록 삭제
  */
 export const getSalesRecordsList = (params : RequestSalesRecordsList) => {
   return api.get('records/sales', { params });
@@ -152,8 +155,9 @@ export const deleteSalesRecord = (id: number) => {
  * 회원 가입 API
  * 
  * 아래 기능들을 제공합니다:
- * - 이메일 발송 코드 오쳥(이메일로 요청)
- * - 이메일 발송 코드 인증(이메일과 이메일 코드로 요청)
+ * - 이메일 발송 코드 오쳥
+ * - 비로그인 비밀번호 재설정을 위한 이메일 발송 코드 오쳥
+ * - 이메일 발송 코드 인증
  * - 회원가입
  */
 export const requestEmailVerification = (email: string) => {
@@ -176,6 +180,7 @@ export const register = (registerForm: registerForm) => {
  * - 로그인
  * - 리프레쉬 토큰으 이용한 엑세스토큰 재요청
  * - 로그인 후 사용자 정보 요청
+ * - 로그아웃
  */
 export const login = (loginForm: { email: string, password: string }) => {
   return api.post('auth/login', loginForm)
@@ -194,8 +199,8 @@ export const logout = () => {
  * 매장 API
  * 
  * 아래 기능들을 제공합니다:
- * - 매장 생성(이미지 파일 포함)
- * - 매장 수정(이미지 파일 포함)
+ * - 매장 생성
+ * - 매장 수정
  * - 매장 삭제
  */
 export const createStore = (storeData: storeForm, imageFile: File | null) => {
@@ -230,9 +235,10 @@ export const deleteStore = (id: number) => {
  * 유저 정보 API
  * 
  * 아래 기능들을 제공합니다:
- * - 유저 정보 수정(이미지 파일 포함)
- * - 유저 이메일 프로모션 동의 여부 수정(이미지 파일 포함)
+ * - 유저 정보 수정
+ * - 유저 이메일 프로모션 동의 여부 수정
  * - 비밀번호 변경
+ * - 비로그인 비밀번호 변경
  * - 탈퇴
  */
 export const updateUser = (userData: { name: string, phone: string }, imageFile: File | null) => {
@@ -253,6 +259,9 @@ export const updateEmailConsent = (emailConsent: boolean) => {
 export const updatePassword = (passwordData: { currentPassword: string, newPassword: string }) => {
   return api.patch('auth/password', passwordData)
 }
+export const resetPassowrd = (data : resetPasswordRequest) => {
+  return api.patch('auth/password/reset', data)
+}
 export const withdraw = () => {
   return api.delete('/user');
 }
@@ -271,6 +280,16 @@ export const updateDelveryPlatformInfo = (storeId : number, data : DeliveryPlatf
   return api.put(`/deliveryCommission/${storeId}`, data);
 }
 
+/**
+ * 통계(Dashboard) API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 매출/지출 통계 (월별, 일별)
+ * - 매출 유형별 통계 (월별, 일별)
+ * - 배달 플랫폼별 통계 (월별, 일별)
+ * - 전체 재무 요약 통계 (월별, 연도별)
+ * - 첫 매출 기록 연도 조회
+ */
 export const getSalesExpenseStatsMonthly = (storeId: number, year: string, isExcludeDeliveryCommission : boolean) => {
   return api.get(`/summary/salesExpense/monthly?storeId=${storeId}&year=${year}&excludeDeliveryCommission=${isExcludeDeliveryCommission}`);
 }
@@ -306,12 +325,14 @@ export const getFirstYear = (storeId : number) => {
   return api.get(`/summary/firstYear?storeId=${storeId}`)
 }
 
+/**
+ * 통계(Dashboard) API
+ * 
+ * 아래 기능들을 제공합니다:
+ * - 지원 메일 발송
+ */
 export const sendHelp = (data : helpRequest) => {
   return api.post('/help', data)
-}
-
-export const resetPassowrd = (data : resetPasswordRequest) => {
-  return api.patch('auth/password/reset', data)
 }
 
 

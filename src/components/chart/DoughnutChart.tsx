@@ -19,7 +19,7 @@ interface DoughnutChartProps {
   dataItems: DoughnutDataItem[];
 }
 
-const DoughnutChart: React.FC<DoughnutChartProps> = ({ dataItems }) => {
+export default function DoughnutChart ({ dataItems } : DoughnutChartProps){
   const chartData = {
     labels: dataItems.map((item) => item.label),
     datasets: [
@@ -51,5 +51,3 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ dataItems }) => {
 
   return <Doughnut data={chartData} options={options} />;
 };
-
-export default DoughnutChart;

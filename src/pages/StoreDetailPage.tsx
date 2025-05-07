@@ -106,9 +106,15 @@ export default function StoreDetailPage() {
       const message = "매장을 삭제했습니다."
       showSnackbar(message, "success");
       fetchCurrentUser();
-      //TODO : 뒤로가기
+      openAlert({
+        content : "매장을 삭제했습니다.",
+        buttonCount : 1,
+        onConfirm: () => { navigate('/myStore') }
+      }
+      )
     },
     (msg) => showSnackbar(msg, "error"),
+    { delay: true }
   )
 
   const onSubmit = (data: any) => {

@@ -1,4 +1,4 @@
-import { useEffect, useContext, useState } from 'react';
+import { useEffect, useContext } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Box,
@@ -220,9 +220,6 @@ export default function ExpenseRecordForm({ mode, handleSubbmitAndClose, rowId }
           </FormControl>
         </Box>
       </Box>
-
-
-
       <Box>
         <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>비고</Typography>
         <TextField

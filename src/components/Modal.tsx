@@ -3,7 +3,6 @@ import { Box, Fade } from '@mui/material';
 import Modal from '@mui/material/Modal';
 import ModalTitle from './ModalTitle'
 import Close from '@mui/icons-material/Close'
-import { Global } from '@emotion/react';
 
 const style = {
   position: 'absolute',

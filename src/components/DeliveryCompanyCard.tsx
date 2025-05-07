@@ -1,12 +1,11 @@
 import { useFormContext, Controller } from 'react-hook-form';
-import { TextField, Checkbox, FormControlLabel, Box, Avatar, InputAdornment, Typography } from '@mui/material';
+import { TextField, Box, Avatar, InputAdornment, Typography } from '@mui/material';
 
 interface DeliveryCompanyCardProps {
     name: string;
     image: string;
     nameKo: string,
 }
-
 export default function DeliveryCompanyCard({ name, image, nameKo}: DeliveryCompanyCardProps) {
     const { control } = useFormContext();
     return (
@@ -52,18 +51,6 @@ export default function DeliveryCompanyCard({ name, image, nameKo}: DeliveryComp
                     )}
                 />
             </Box>
-            {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Typography>서비스 사용 여부: </Typography>
-                <Controller
-                    name={`${name}Enabled`}
-                    control={control}
-                    render={({ field }) => (
-                        <Checkbox checked={Boolean(field.value)} onChange={(e) => field.onChange(e.target.checked)} />
-                    )}
-                />
-            </Box> */}
         </Box>
-
-
     );
 }

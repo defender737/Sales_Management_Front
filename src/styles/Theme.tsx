@@ -1,5 +1,4 @@
-import React from 'react';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import { PaletteMode } from '@mui/material';
 
 declare module "@mui/material/styles" {

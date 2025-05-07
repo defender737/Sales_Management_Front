@@ -1,15 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/useAuthStore'
 
-const RedirectRoute = () => {
+export default function RedirectRoute() {
   const {accessToken} = useAuthStore();
 
   if (accessToken) {
-    //TODO : 데쉬보드 페이지로 리다이렉트되도록 변경
     return <Navigate to="/dashboard" replace />;
   } else {
     return <Navigate to="/login" replace />;
   }
 };
-
-export default RedirectRoute;

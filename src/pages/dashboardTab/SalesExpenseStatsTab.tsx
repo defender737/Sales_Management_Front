@@ -3,7 +3,7 @@ import { Box, Paper, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2'
 import BarChart from '../../components/chart/BarChart';
 import LineChart from '../../components/chart/LineChart';
-import DataTable from '../../components/chart/dataTable';
+import DataTable from '../../components/chart/DataTable';
 import { useApiRequest } from '../../hooks/useApiRequest';
 import { getSalesExpenseStatsMonthly, getSalesExpenseStatsDaily } from '../../api/api';
 import { useSelectedStore } from '../../stores/useSelectedStore';

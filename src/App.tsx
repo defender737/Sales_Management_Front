@@ -7,7 +7,7 @@ import Footer from "./components/Footer"
 import MainContent from "./components/MainContent";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
-import { SnackbarProvider } from './components/SnackbarProvier';
+import { SnackbarProvider } from './providers/SnackbarProvier';
 import PublicOnlyRoute from './components/routingComponents/PublicOnlyRoute';
 import RedirectRoute from './components/routingComponents/RedirectRoute';
 import {useAuthInitializer} from './hooks/useAuthInitializer'

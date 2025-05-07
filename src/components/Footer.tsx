@@ -1,12 +1,11 @@
 import { Box, Typography } from '@mui/material';
 
-const Footer = () => {
+export default function Footer (){
   return (
     <Box
       component="footer"
       sx={{
         height: 60,
-        bgcolor: "white",
         textAlign: 'center',
         p: 2,
         mt : 'auto'
@@ -18,5 +17,3 @@ const Footer = () => {
     </Box>
   );
 };
-
-export default Footer;

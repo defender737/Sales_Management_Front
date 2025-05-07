@@ -1,4 +1,4 @@
-import {useState, useContext} from 'react';
+import {useContext} from 'react';
 import {
   Box,
   TextField,
@@ -11,7 +11,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { updatePassword } from '../api/api'
 import { SnackbarContext } from '../contexts/SnackbarContext';
 import { useApiRequest } from '../hooks/useApiRequest';
-import axios from 'axios';
 
 interface UpdatePassword {
   handleClose : () => void

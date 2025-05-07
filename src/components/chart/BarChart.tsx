@@ -1,4 +1,3 @@
-// components/charts/BarChart.tsx
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -24,7 +23,7 @@ import {
     stacked? : boolean
   }
   
-  const BarChart = ({ labels, datasets, stacked = false }: BarChartProps) => {
+  export default function BarChart({ labels, datasets, stacked = false }: BarChartProps) {
     const data = {
       labels,
       datasets,
@@ -46,5 +45,3 @@ import {
   
     return <Bar data={data} options={options} />;
   };
-  
-  export default BarChart;

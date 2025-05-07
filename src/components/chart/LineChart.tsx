@@ -30,7 +30,7 @@ import {
     }[];
   }
   
-  const LineChart = ({ labels, dataSets }: LineChartProps) => {
+  export default function LineChart ({ labels, dataSets }: LineChartProps) {
     const data = {
       labels,
       datasets: dataSets.map(set => ({
@@ -57,6 +57,4 @@ import {
   
     return <Line data={data} options={options} />;
   };
-  
-  export default LineChart;
   

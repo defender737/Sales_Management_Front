@@ -1,5 +1,4 @@
 import { Dialog, DialogContent, Typography, Box, Button } from '@mui/material';
-import React from 'react';
 
 interface AlertModalProps {
   open: boolean;

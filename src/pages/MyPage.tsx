@@ -25,6 +25,8 @@ import { useFormModal } from '../stores/useFormModal';
 import { useApiRequest } from '../hooks/useApiRequest';
 import { useFetchCurrentUser } from '../hooks/useFetchCurrentUser'
 import { useSelectedStore } from '../stores/useSelectedStore';
+import { useNavigate } from "react-router-dom";
+
 
 const pageTitle = {
   title: '마이페이지',
@@ -39,6 +41,7 @@ const loginType = {
 };
 
 export default function MyPage() {
+  const navigate = useNavigate();
   const { handleSubmit, control } = useForm();
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -88,6 +91,7 @@ export default function MyPage() {
       setUser(null);
       setAccessToken(null);
       setSelectedStoreId(null);
+      navigate('/login');
     },
     (msg) => showSnackbar(msg, "error"),
     { delay: true }

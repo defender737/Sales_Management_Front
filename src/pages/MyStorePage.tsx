@@ -34,6 +34,18 @@ export default function MyStorePage() {
         <Box sx={{ mx: 'auto' }}>
             <PageTitle title={pageTitle.title} subTitle={pageTitle.subTitle} />
             <Grid container spacing={3}>
+                {user?.storeList.length === 0 && (
+                    <Grid  size={{ xs: 12}}>
+                        <Box sx={{
+                            height: 300,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }}>
+                            <Typography color="text.secondary">등록된 매장이 없습니다.</Typography>
+                        </Box>
+                    </Grid>
+                )}
                 {user?.storeList.map((store) => (
                     <Grid size={{ xs: 12, sm: 6, md: 4 }} key={store.id}>
                         <Card
