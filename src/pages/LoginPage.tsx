@@ -46,6 +46,29 @@ export default function LoginPage() {
         emailRef.current = data.email
         loginRequest(data);
     }
+
+    const openOauthPopup = (provider: 'google' | 'kakao' | 'naver') => {
+        const popup = window.open(
+            `http://localhost:8080/api/oauth2/authorization/${provider}`,
+            '_blank',
+            'width=500,height=600'
+        );
+
+        window.addEventListener('message', (event) => {
+            if (event.origin !== 'http://localhost:8080') return;
+
+            const { accessToken, errorMessage } = event.data;
+
+            if (accessToken) {
+                setAccessToken(accessToken);
+                fetchCurrentUser();
+                navigate('/dashboard');
+            } else if(errorMessage) {
+                alert(errorMessage);
+            }
+        });
+    };
+
     return (
         <Box sx={{ display: 'flex', minHeight: '100vh', backgroundImage: 'url(/assets/img/backImage.jpg)' }}>
             <Box
@@ -103,6 +126,7 @@ export default function LoginPage() {
                                 minWidth: 0,
                                 borderRadius: '50%',
                             }}
+                            onClick={() => openOauthPopup('kakao')}
                         >
                             <Box
                                 component="img"
@@ -117,6 +141,7 @@ export default function LoginPage() {
                                 minWidth: 0,
                                 borderRadius: '50%',
                             }}
+                            onClick={() => openOauthPopup('naver')}
                         >
                             <Box
                                 component="img"
@@ -131,6 +156,7 @@ export default function LoginPage() {
                                 minWidth: 0,
                                 borderRadius: '50%',
                             }}
+                            onClick={() => openOauthPopup('google')}
                         >
                             <Box
                                 component="img"
