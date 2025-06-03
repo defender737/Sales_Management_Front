@@ -125,7 +125,7 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       {store
                         ?
-                        <Avatar src={store?.fileUrl ? `http://localhost:8080/api${store.fileUrl}` : undefined} sx={{ width: 30, height: 30, }}>
+                        <Avatar src={store?.fileUrl ? `${process.env.REACT_APP_API_BASE_URL}${store.fileUrl}` : undefined} sx={{ width: 30, height: 30, }}>
                           <StoreIcon fontSize="small" />
                         </Avatar>
                         :
@@ -141,7 +141,7 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
                   user?.storeList.map((store) => (
                     <MenuItem key={store.id} value={store.id}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar src={`http://localhost:8080/api${store?.fileUrl}`} sx={{ width: 30, height: 30 }}>
+                        <Avatar src={`${process.env.REACT_APP_API_BASE_URL}${store?.fileUrl}`} sx={{ width: 30, height: 30 }}>
                           <StoreIcon fontSize='small' />
                         </Avatar>
                       </Box>
@@ -172,7 +172,7 @@ export default function Header({ open, handleDrawerOpen }: HeaderProps) {
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box onClick={handleAvatarClick} sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mr: 3 }} >
               <Avatar
-                src={user?.fileUrl ? `http://localhost:8080/api${user.fileUrl}` : undefined}
+                src={user?.fileUrl ? `${process.env.REACT_APP_API_BASE_URL}${user.fileUrl}` : undefined}
                 sx={{ bgcolor: "orange" }}>
                 {user?.name?.charAt(0) ?? 'U'}
               </Avatar>

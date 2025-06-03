@@ -70,9 +70,9 @@ export default function DeliveryManagementPage() {
             <DeliveryCompanyCard name='ddangyo' nameKo="땡겨요" image='/assets/img/icons/ddangyo.png' />
             <DeliveryCompanyCard name='brand' nameKo="브랜드 배달" image='/assets/img/icons/delivery_company.png' />
             <Box sx={{ display: "flex", justifyContent: "right", mt: 2 }}>
-              <Button disabled={updateLoading} type='submit' variant="contained" size="large" sx={{ ml: 2, width: 150 }}>
+              <Button disabled={updateLoading} type='submit' variant="contained" size="large" sx={{ ml: 2, width: 150, minHeight:'42.5px' }}>
                 {updateLoading ? (
-                  <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                  <CircularProgress size='1.3em' sx={{ color: 'inherit' }} />
                 ) : (
                   <>
                     <SaveIcon sx={{ mr: 1 }} /> 저장 하기

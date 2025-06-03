@@ -408,9 +408,9 @@ export default function SignupPage() {
                                 </Accordion>
                             </Box>
 
-                            <Button type="submit" variant="contained" color="primary" disabled={!isEmailVerified || signupComplite} fullWidth sx={{ mt: 3, fontSize: 18 }}>
+                            <Button type="submit" variant="contained" color="primary" disabled={!isEmailVerified || signupComplite} fullWidth sx={{ mt: 3, fontSize: 18, minHeight: '45.5px' }}>
                                 {registerLoading ? (
-                                    <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                                    <CircularProgress size="1.3em" sx={{ color: 'inherit' }} />
                                 ) : "회원 가입"
                                 }
                             </Button>

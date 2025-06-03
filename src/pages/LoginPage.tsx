@@ -49,13 +49,13 @@ export default function LoginPage() {
 
     const openOauthPopup = (provider: 'google' | 'kakao' | 'naver') => {
         const popup = window.open(
-            `http://localhost:8080/api/oauth2/authorization/${provider}`,
+            `${process.env.REACT_APP_API_BASE_URL}/oauth2/authorization/${provider}`,
             '_blank',
             'width=500,height=600'
         );
 
         window.addEventListener('message', (event) => {
-            if (event.origin !== 'http://localhost:8080') return;
+            // if (event.origin !== 'http://localhost:8080') return;
 
             const { accessToken, errorMessage } = event.data;
 
@@ -83,10 +83,10 @@ export default function LoginPage() {
                     p: 4,
                 }}
             >
-                <Typography variant="h1" fontWeight={600}>
+                <Typography fontWeight={600} sx={{fontWeight:'600', fontSize:'70px'}}>
                     Tally
                 </Typography>
-                <Typography variant="subtitle1" sx={{ mt: 2 }}>
+                <Typography sx={{ mt: 2, fontSize: '20px' }}>
                     우리 가게 매출관리
                 </Typography>
 
@@ -107,9 +107,9 @@ export default function LoginPage() {
                                 비밀번호 찾기
                             </Link>
                         </Box>
-                        <Button type='submit' variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: 18 }}>
+                        <Button type='submit' variant="contained" color="primary" fullWidth sx={{ mt: 3, fontSize: 18, minHeight: '45.5px' }}>
                             {loginLoading ? (
-                                <CircularProgress size={31} sx={{ color: 'inherit' }} />
+                                <CircularProgress size="1.3em" sx={{ color: 'inherit' }} />
                             ) : "로그인"
                             }
                         </Button>

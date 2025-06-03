@@ -85,8 +85,8 @@ export default function HelpPage() {
                         </Box>
                     </Box>
                     <Box sx={{ display: "flex", justifyContent: "right", mt: 2 }}>
-                        <Button disabled = {loading} type='submit' variant="contained" size="large" sx={{ ml: 2 }}>
-                            {loading ? <CircularProgress size={20} color='inherit' /> : "보내기"}   
+                        <Button disabled = {loading} type='submit' variant="contained" size="large" sx={{ ml: 2, width: 150, minHeight:'42.5px' }}>
+                            {loading ? <CircularProgress size='1.3em' color='inherit' /> : "보내기"}
                         </Button>
                     </Box>
                 </Paper>

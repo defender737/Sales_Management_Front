@@ -59,7 +59,7 @@ export default function MyStorePage() {
                                 onClick={() => navigate(`/myStore/edit/${store.id}`)}>
                                 <CardMedia
                                     component="img"
-                                    image={store.fileUrl ? `http://localhost:8080/api${store.fileUrl}` : 'assets/img/storeDefault.png'}
+                                    image={store.fileUrl ? `${process.env.REACT_APP_API_BASE_URL}${store.fileUrl}` : 'assets/img/storeDefault.png'}
                                     alt={store.storeName}
                                     sx={{
                                         aspectRatio: '2/1',

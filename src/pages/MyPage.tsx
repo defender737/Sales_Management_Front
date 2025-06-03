@@ -150,7 +150,7 @@ export default function MyPage() {
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10, width: '100%' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, justifyContent: 'center', alignItems: 'center', ml: 3 }}>
             <Avatar
-              src={previewUrl ? previewUrl : (user?.fileUrl ? `http://localhost:8080/api${user.fileUrl}` : undefined)}
+              src={previewUrl ? previewUrl : (user?.fileUrl ? `${process.env.REACT_APP_API_BASE_URL}${user.fileUrl}` : undefined)}
               alt='유저 이미지 미리보기'
               sx={{ width: 250, height: 250 }}
             ></Avatar>
@@ -224,9 +224,9 @@ export default function MyPage() {
               <Button onClick={handleUpdatePasswordButton} variant="contained" color="primary" size='large' sx={{ width: 150 }}>
                 비밀번호 변경
               </Button>
-              <Button type="submit" disabled={updateLoading} variant="contained" color="primary" size='large' sx={{ width: 150 }}>
+              <Button type="submit" disabled={updateLoading} variant="contained" color="primary" size='large' sx={{ width: 150, minHeight:"42.25px" }}>
                 {updateLoading ? (
-                  <CircularProgress size={24} sx={{ color: 'inherit' }} />
+                  <CircularProgress size="1.3em" sx={{ color: 'inherit' }} />
                 ) : "내 정보 수정"
                 }
               </Button>

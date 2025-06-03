@@ -7,6 +7,8 @@ WORKDIR /app
 ARG REACT_APP_API_BASE_URL
 ENV REACT_APP_API_BASE_URL=$REACT_APP_API_BASE_URL
 
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+
 # package.json과 lock 파일 복사
 COPY package*.json ./
 
@@ -23,6 +25,9 @@ FROM nginx:alpine
 
 # React build 결과물을 Nginx의 기본 루트에 복사
 COPY --from=builder /app/build /usr/share/nginx/html
+
+# 커스텀 Nginx 설정 복사
+#COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
 
 # 커스텀 nginx 설정 덮어쓰기 (Optional)
 # COPY nginx.conf /etc/nginx/nginx.conf

@@ -79,7 +79,7 @@ export default function StoreDetailPage() {
         setValue('roadAddress', store.roadAddress);
         setValue('detailAddress', store.detailAddress);
         setValue('description', store.description);
-        setPreviewUrl(`http://localhost:8080/api${store.fileUrl}`);
+        setPreviewUrl(`${process.env.REACT_APP_API_BASE_URL}${store.fileUrl}`);
       }
     }
   }, [id])
@@ -269,11 +269,11 @@ export default function StoreDetailPage() {
           />
           <Box sx={{ display: 'flex', width: "100%", justifyContent: 'flex-end' }}>
             {isEdit &&
-              <Button disabled={deleteLoading} onClick={handleDeleteButton} variant="contained" color="error" size='large' sx={{ width: 130, mr: 2 }}>
-                {deleteLoading ? <CircularProgress size={20} color='inherit' /> : "매장 삭제"}
+              <Button disabled={deleteLoading} onClick={handleDeleteButton} variant="contained" color="error" size='large' sx={{ width: 130, mr: 2, minHeight:"42.25px" }}>
+                {deleteLoading ? <CircularProgress size="1.3em" color='inherit' /> : "매장 삭제"}
               </Button>}
-            <Button disabled = {createOrUpdateLoading} type="submit" variant="contained" color="primary" size='large' sx={{ width: 130 }}>
-              {createOrUpdateLoading ? <CircularProgress size={20} color='inherit' /> : isEdit ? "정보 수정" : "매장 추가"}
+            <Button disabled = {createOrUpdateLoading} type="submit" variant="contained" color="primary" size='large' sx={{ width: 130, minHeight:"42.25px" }}>
+              {createOrUpdateLoading ? <CircularProgress size="1.3em" color='inherit' /> : isEdit ? "정보 수정" : "매장 추가"}
             </Button>
           </Box>
         </Box>
