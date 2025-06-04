@@ -14,7 +14,7 @@ export default function DataTable({ headers, rows, tableRow }: DataTableProps) {
                     <TableRow>
                         <TableCell sx={{ fontWeight: 'bold', minWidth : 120 }}>구분</TableCell>
                         {headers.map((header, idx) => (
-                            <TableCell key={idx} align="center" sx={{ fontWeight: 'bold', minWidth : 100 }}>{header}</TableCell>
+                            <TableCell key={idx} align="center" sx={{ fontWeight: 'bold', minWidth : 105 }}>{header}</TableCell>
                         ))}
                     </TableRow>
                 </TableHead>

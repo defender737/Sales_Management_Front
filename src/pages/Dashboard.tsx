@@ -124,7 +124,7 @@ export default function Dashboard() {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                             <Typography variant="h6">매출 총액</Typography>
                             <Tooltip
-                                title={`배달 플랫폼 수수료 ${summary.totalCommission}원이 제외된 금액입니다.`}
+                                title={`배달 플랫폼 수수료 ${summary.totalCommission.toLocaleString()}원이 제외된 금액입니다.`}
                                 placement='top'
                                 slotProps={{
                                     tooltip: {
@@ -138,19 +138,19 @@ export default function Dashboard() {
                                 <HelpOutlineIcon sx={{ width: 18, height: 18, color: 'text.secondary' }} />
                             </Tooltip>
                         </Box>
-                        <Typography variant="h4" fontWeight="bold">{summary.totalSales}원</Typography>
+                        <Typography variant="h4" fontWeight="bold">{summary.totalSales.toLocaleString()}원</Typography>
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Paper elevation={3} sx={{ p: 3, minWidth: 400 }}>
                         <Typography variant="h6">지출 총액</Typography>
-                        <Typography variant="h4" fontWeight="bold">{summary.totalExpenses}원</Typography>
+                        <Typography variant="h4" fontWeight="bold">{summary.totalExpenses.toLocaleString()}원</Typography>
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Paper elevation={3} sx={{ p: 3, minWidth: 400 }}>
                         <Typography variant="h6">순수익</Typography>
-                        <Typography variant="h4" fontWeight="bold">{summary.netProfit}원</Typography>
+                        <Typography variant="h4" fontWeight="bold">{summary.netProfit.toLocaleString()}원</Typography>
                     </Paper>
                 </Grid>
             </Grid>
