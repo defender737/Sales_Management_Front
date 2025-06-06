@@ -78,7 +78,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const menuItems1 = [
-  { text: "매츨 기록", icon: <DeliveryDining />, path: "/salesRecord" },
+  { text: "매출 기록", icon: <DeliveryDining />, path: "/salesRecord" },
   { text: "지출 기록", icon: <MonetizationOnIcon />, path: "/expenseRecord" },
   { text: "배달 관리", icon: <AttachMoney />, path: "/deliveryManagement" }
 ];
