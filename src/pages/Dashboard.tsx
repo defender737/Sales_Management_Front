@@ -11,6 +11,7 @@ import { SnackbarContext } from '../contexts/SnackbarContext';
 import { useSelectedStore } from '../stores/useSelectedStore';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import Toggle from '../components/Toggle'
+import CountUp from 'react-countup';
 
 const pageTitle = {
     title: '대시보드',
@@ -138,19 +139,25 @@ export default function Dashboard() {
                                 <HelpOutlineIcon sx={{ width: 18, height: 18, color: 'text.secondary' }} />
                             </Tooltip>
                         </Box>
-                        <Typography variant="h4" fontWeight="bold">{summary.totalSales.toLocaleString()}원</Typography>
+                        <Typography variant="h4" fontWeight="bold">
+                            <CountUp end={summary.totalSales} duration={1} separator="," prefix="원" />
+                        </Typography>
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Paper elevation={3} sx={{ p: 3, minWidth: 400 }}>
                         <Typography variant="h6">지출 총액</Typography>
-                        <Typography variant="h4" fontWeight="bold">{summary.totalExpenses.toLocaleString()}원</Typography>
+                        <Typography variant="h4" fontWeight="bold">
+                            <CountUp end={summary.totalExpenses} duration={1} separator="," prefix="원" />
+                        </Typography>
                     </Paper>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
                     <Paper elevation={3} sx={{ p: 3, minWidth: 400 }}>
                         <Typography variant="h6">순수익</Typography>
-                        <Typography variant="h4" fontWeight="bold">{summary.netProfit.toLocaleString()}원</Typography>
+                        <Typography variant="h4" fontWeight="bold">
+                            <CountUp end={summary.netProfit} duration={1} separator="," prefix="원" />
+                        </Typography>
                     </Paper>
                 </Grid>
             </Grid>
