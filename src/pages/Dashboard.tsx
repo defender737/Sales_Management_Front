@@ -140,7 +140,7 @@ export default function Dashboard() {
                             </Tooltip>
                         </Box>
                         <Typography variant="h4" fontWeight="bold">
-                            <CountUp end={summary.totalSales} duration={1} separator="," prefix="원" />
+                            <CountUp end={summary.totalSales} duration={1} separator="," suffix="원" />
                         </Typography>
                     </Paper>
                 </Grid>
@@ -148,7 +148,7 @@ export default function Dashboard() {
                     <Paper elevation={3} sx={{ p: 3, minWidth: 400 }}>
                         <Typography variant="h6">지출 총액</Typography>
                         <Typography variant="h4" fontWeight="bold">
-                            <CountUp end={summary.totalExpenses} duration={1} separator="," prefix="원" />
+                            <CountUp end={summary.totalExpenses} duration={1} separator="," suffix="원" />
                         </Typography>
                     </Paper>
                 </Grid>
@@ -156,7 +156,7 @@ export default function Dashboard() {
                     <Paper elevation={3} sx={{ p: 3, minWidth: 400 }}>
                         <Typography variant="h6">순수익</Typography>
                         <Typography variant="h4" fontWeight="bold">
-                            <CountUp end={summary.netProfit} duration={1} separator="," prefix="원" />
+                            <CountUp end={summary.netProfit} duration={1} separator="," suffix="원" />
                         </Typography>
                     </Paper>
                 </Grid>
