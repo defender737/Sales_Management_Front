@@ -58,8 +58,8 @@ export default function ExpenseRecordForm({ mode, handleSubbmitAndClose, rowId }
   const { request: createRequest, loading: createLoading, success: createSuccess} =
     useApiRequest(
       (storeId: number, form: ExpenseRecordFormRequest) => createExpenseRecord(storeId, form),
-      () => {
-        showSnackbar("기록을 추가했습니다.", "success");
+      (response) => {
+        showSnackbar(response.data, "success");
         setTimeout(() => handleSubbmitAndClose(), 1500);
       },
       (msg) => showSnackbar(msg, "error"),
@@ -69,8 +69,8 @@ export default function ExpenseRecordForm({ mode, handleSubbmitAndClose, rowId }
   const { request: updateRequest, loading: updateLoading, success: updateSuccess} =
     useApiRequest(
       (rowId: number, form: ExpenseRecordFormRequest) => updateExpenseRecord(rowId, form),
-      () => {
-        showSnackbar("기록을 수정했습니다.", "success");
+      (response) => {
+        showSnackbar(response.data, "success");
         setTimeout(() => handleSubbmitAndClose(), 1500);
       },
       (msg) => showSnackbar(msg, "error"),
@@ -80,8 +80,8 @@ export default function ExpenseRecordForm({ mode, handleSubbmitAndClose, rowId }
   const { request: deleteRequest, loading: deleteLoading, success: deleteSuccess} =
     useApiRequest(
       (rowId: number) => deleteExpenseRecord(rowId),
-      () => {
-        showSnackbar("기록을 삭제했습니다.", "success");
+      (response) => {
+        showSnackbar(response.data, "success");
         setTimeout(() => handleSubbmitAndClose(), 1500);
       },
       (msg) => showSnackbar(msg, "error"),

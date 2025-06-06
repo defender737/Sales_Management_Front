@@ -86,12 +86,12 @@ export default function StoreDetailPage() {
 
   const { request: createOrUpdateRequest, loading : createOrUpdateLoading} = useApiRequest(
     (data) => isEdit ? updateStore(Number(id), data, imageFile) : createStore(data, imageFile),
-    () => {
-      const message = isEdit ? "매장 정보를 수정했습니다" : "새로운 매장이 등록되었습니다"
+    (response) => {
+      const message = response.data
       showSnackbar(message, "success");
       fetchCurrentUser();
       openAlert({
-        content: isEdit ? "매장 정보를 수정했습니다." : "매장을 추가했습니다.",
+        content: message,
         buttonCount: 1,
         onConfirm: () => { !isEdit && navigate('/') }
       })
@@ -102,12 +102,12 @@ export default function StoreDetailPage() {
 
   const { request: deleteRequest, loading : deleteLoading } = useApiRequest(
     () => deleteStore(Number(id)),
-    () => {
-      const message = "매장을 삭제했습니다."
+    (response) => {
+      const message = response.data
       showSnackbar(message, "success");
       fetchCurrentUser();
       openAlert({
-        content : "매장을 삭제했습니다.",
+        content : message,
         buttonCount : 1,
         onConfirm: () => { navigate('/myStore') }
       }

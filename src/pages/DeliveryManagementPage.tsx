@@ -27,8 +27,8 @@ export default function DeliveryManagementPage() {
   const showSnackbar = useContext(SnackbarContext)
   const { request: updateRequest, loading: updateLoading } = useApiRequest(
     (storeId: number, data: DeliveryPlatform) => updateDelveryPlatformInfo(storeId, data),
-    () => {
-      showSnackbar("배달 정보가 수정되었습니다.", "success");
+    (response) => {
+      showSnackbar(response.data, "success");
     },
     (msg) => showSnackbar(msg, "error"),
     { delay: true }

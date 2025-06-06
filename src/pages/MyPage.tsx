@@ -55,12 +55,13 @@ export default function MyPage() {
   const { fetchCurrentUser } = useFetchCurrentUser();
   const { request: updateRequest, loading: updateLoading } = useApiRequest(
     (data) => updateUser(data, imageFile),
-    () => {
+    (response) => {
+      let message = response.data;
       openAlert({
-        content: '정보 수정이 완료되었습니다.',
+        content: message,
         buttonCount: 1,
       });
-      showSnackbar("사용자 정보를 수정했습니다.", "success");
+      showSnackbar(message, "success");
       fetchCurrentUser();
     },
     (msg) => showSnackbar(msg, "error")
@@ -70,10 +71,7 @@ export default function MyPage() {
   const { request: emailConsentUpdateRequest } = useApiRequest(
     (checked: boolean) => updateEmailConsent(checked),
     (response) => {
-      console.log(response)
-      // showSnackbar(response.data, "success");
-      showSnackbar(response.data.isEmailConsent ?
-        "이메일 프로모션 정보 수신을 동의하셨습니다." : "이메일 프로모션 정보 수신 동의를 해제하였습니다.", "success");
+      showSnackbar(response.data, "success");
     },
     (msg) => {
       showSnackbar(msg, "error")
@@ -83,9 +81,9 @@ export default function MyPage() {
 
   const { request: withdrawRequest } = useApiRequest(
     () => withdraw(),
-    () => {
+    (response) => {
       openAlert({
-        content: '탈퇴가 완료되었습니다.',
+        content: response.data,
         buttonCount: 1,
       });
       setUser(null);

@@ -23,9 +23,9 @@ export default function HelpPage() {
     const { open: openAlert } = useAlertModal();
     const {request, loading} = useApiRequest(
         (data : helpRequest) =>  sendHelp(data),
-        () => {
+        (response) => {
             openAlert({
-                content: "문의가 전송되었습니다.\n 빠른 시일내로 답장드리겠습니다.",
+                content: response.data,
                 buttonCount: 1,
               })
         },
