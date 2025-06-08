@@ -89,7 +89,7 @@ api.interceptors.response.use(
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
-    if (token && !config.url?.includes('auth')) {
+    if (token && (!config.url?.includes('auth') || config.url?.includes('auth/logout'))) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
